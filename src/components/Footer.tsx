@@ -1,4 +1,6 @@
 export default function Footer() {
+  const instagramUrl = process.env.NEXT_PUBLIC_INSTAGRAM_URL || "#";
+
   return (
     <footer className="bg-andes-black border-t border-andes-mountain/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -18,22 +20,16 @@ export default function Footer() {
             </h4>
             <div className="space-y-2">
               <a
-                href="/productos"
+                href="/catalogo"
                 className="block text-sm text-andes-snow/70 hover:text-andes-ice transition-colors"
               >
                 Catálogo
               </a>
               <a
-                href="/historia"
+                href="/"
                 className="block text-sm text-andes-snow/70 hover:text-andes-ice transition-colors"
               >
-                Historia
-              </a>
-              <a
-                href="/contacto"
-                className="block text-sm text-andes-snow/70 hover:text-andes-ice transition-colors"
-              >
-                Contacto
+                Inicio
               </a>
             </div>
           </div>
@@ -44,7 +40,7 @@ export default function Footer() {
             </h4>
             <div className="space-y-2">
               <a
-                href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}`}
+                href="https://wa.me/5492942530736"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block text-sm text-andes-snow/70 hover:text-andes-ice transition-colors"
@@ -52,7 +48,7 @@ export default function Footer() {
                 WhatsApp
               </a>
               <a
-                href={process.env.NEXT_PUBLIC_INSTAGRAM_URL}
+                href={instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block text-sm text-andes-snow/70 hover:text-andes-ice transition-colors"

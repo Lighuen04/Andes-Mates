@@ -1,3 +1,18 @@
+export function getWhatsAppLink(phone: string, productName?: string): string {
+  const base = `https://wa.me/${phone}`;
+  if (productName) {
+    const text = encodeURIComponent(
+      `Hola, quiero consultar por: ${productName}`
+    );
+    return `${base}?text=${text}`;
+  }
+  return base;
+}
+
+export function getWhatsAppNumber(): string {
+  return "5492942530736";
+}
+
 export function slugify(text: string): string {
   return text
     .toLowerCase()
@@ -15,15 +30,4 @@ export function formatPrecio(precio: number | null): string {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(precio);
-}
-
-export function getWhatsAppLink(numero: string, productoNombre: string): string {
-  const mensaje = encodeURIComponent(
-    `Hola, quiero consultar por el producto: ${productoNombre}`
-  );
-  return `https://wa.me/${numero}?text=${mensaje}`;
-}
-
-export function getWhatsAppLinkGeneral(numero: string): string {
-  return `https://wa.me/${numero}`;
 }

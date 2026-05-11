@@ -1,3 +1,5 @@
+import { getWhatsAppLink, getWhatsAppNumber } from "@/lib/utils";
+
 interface Props {
   productName?: string;
   label?: string;
@@ -9,13 +11,7 @@ export default function WhatsAppButton({
   label = "Consultar por WhatsApp",
   className = "",
 }: Props) {
-  const numero = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "";
-
-  const href = productName
-    ? `https://wa.me/${numero}?text=${encodeURIComponent(
-        `Hola, quiero consultar por el producto: ${productName}`
-      )}`
-    : `https://wa.me/${numero}`;
+  const href = getWhatsAppLink(getWhatsAppNumber(), productName);
 
   return (
     <a

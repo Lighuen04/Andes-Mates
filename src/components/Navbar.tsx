@@ -5,10 +5,18 @@ import { useState } from "react";
 
 const links = [
   { href: "/", label: "Inicio" },
-  { href: "/productos", label: "Catálogo" },
-  { href: "/historia", label: "Historia" },
-  { href: "/contacto", label: "Contacto" },
+  { href: "/catalogo", label: "Catálogo" },
+  { href: "instagram", label: "Instagram", external: true },
+  { href: "whatsapp", label: "WhatsApp", external: true },
 ];
+
+function getHref(link: (typeof links)[0]) {
+  if (!link.external) return link.href;
+  if (link.href === "whatsapp") {
+    return "https://wa.me/5492942530736";
+  }
+  return process.env.NEXT_PUBLIC_INSTAGRAM_URL || "#";
+}
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -25,15 +33,27 @@ export default function Navbar() {
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-sm uppercase tracking-widest text-andes-snow hover:text-andes-ice transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {links.map((link) =>
+              link.external ? (
+                <a
+                  key={link.href}
+                  href={getHref(link)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm uppercase tracking-widest text-andes-snow hover:text-andes-ice transition-colors"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-sm uppercase tracking-widest text-andes-snow hover:text-andes-ice transition-colors"
+                >
+                  {link.label}
+                </Link>
+              )
+            )}
           </div>
 
           <button
@@ -70,16 +90,29 @@ export default function Navbar() {
       {open && (
         <div className="md:hidden border-t border-andes-mountain/30">
           <div className="px-4 py-4 space-y-3">
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className="block text-sm uppercase tracking-widest text-andes-snow hover:text-andes-ice transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {links.map((link) =>
+              link.external ? (
+                <a
+                  key={link.href}
+                  href={getHref(link)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setOpen(false)}
+                  className="block text-sm uppercase tracking-widest text-andes-snow hover:text-andes-ice transition-colors"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className="block text-sm uppercase tracking-widest text-andes-snow hover:text-andes-ice transition-colors"
+                >
+                  {link.label}
+                </Link>
+              )
+            )}
           </div>
         </div>
       )}
