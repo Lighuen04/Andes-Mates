@@ -1,107 +1,127 @@
 export interface CatalogCategory {
   id: string;
-  nombre: string;
+  name: string;
   slug: string;
-  descripcion: string;
+  description?: string;
   imageUrl?: string;
 }
 
 export interface CatalogProduct {
   id: string;
-  nombre: string;
+  name: string;
+  slug: string;
+  category: "mates" | "bombillas" | "materos" | "termos" | "combos";
+  subcategory?: "calabaza" | "algarrobo";
+  description?: string;
+  imageUrl?: string;
+  galleryImages: string[];
+  available: boolean;
+}
+
+export interface CatalogSubcategory {
+  key: string;
+  name: string;
   slug: string;
   categoryId: string;
-  subcategoria?: string;
   imageUrl?: string;
-  disponible: boolean;
+  description?: string;
 }
 
 export const categories: CatalogCategory[] = [
   {
     id: "mates",
-    nombre: "Mates",
+    name: "Mates",
     slug: "mates",
-    descripcion: "Mates de calabaza y algarrobo",
+    description: "Mates de calabaza y algarrobo",
   },
   {
     id: "bombillas",
-    nombre: "Bombillas",
+    name: "Bombillas",
     slug: "bombillas",
-    descripcion: "Bombillas de distintos materiales",
+    description: "Bombillas de distintos materiales",
   },
   {
     id: "materos",
-    nombre: "Materos",
+    name: "Materos",
     slug: "materos",
-    descripcion: "Materos para acompañar el mate",
+    description: "Materos para acompañar el mate",
   },
   {
     id: "termos",
-    nombre: "Termos",
+    name: "Termos",
     slug: "termos",
-    descripcion: "Termos para mantener el agua caliente",
+    description: "Termos para mantener el agua caliente",
   },
   {
     id: "combos",
-    nombre: "Combos",
+    name: "Combos",
     slug: "combos",
-    descripcion: "Combos completos para matear",
+    description: "Combos completos para matear",
+  },
+];
+
+export const subcategories: CatalogSubcategory[] = [
+  {
+    key: "calabaza",
+    name: "Mates de calabaza",
+    slug: "calabaza",
+    categoryId: "mates",
+    description: "Mates tradicionales de calabaza",
+  },
+  {
+    key: "algarrobo",
+    name: "Mates de algarrobo",
+    slug: "algarrobo",
+    categoryId: "mates",
+    description: "Mates tallados en madera de algarrobo",
   },
 ];
 
 export const products: CatalogProduct[] = [
-  // Mates
-  { id: "m1", nombre: "Mate Calabaza 01", slug: "mate-calabaza-01", categoryId: "mates", subcategoria: "calabaza", disponible: true },
-  { id: "m2", nombre: "Mate Calabaza 02", slug: "mate-calabaza-02", categoryId: "mates", subcategoria: "calabaza", disponible: true },
-  { id: "m3", nombre: "Mate Calabaza 03", slug: "mate-calabaza-03", categoryId: "mates", subcategoria: "calabaza", disponible: true },
-  { id: "m4", nombre: "Mate Calabaza 04", slug: "mate-calabaza-04", categoryId: "mates", subcategoria: "calabaza", disponible: false },
-  { id: "m5", nombre: "Mate Algarrobo 01", slug: "mate-algarrobo-01", categoryId: "mates", subcategoria: "algarrobo", disponible: true },
-  { id: "m6", nombre: "Mate Algarrobo 02", slug: "mate-algarrobo-02", categoryId: "mates", subcategoria: "algarrobo", disponible: true },
-  { id: "m7", nombre: "Mate Algarrobo 03", slug: "mate-algarrobo-03", categoryId: "mates", subcategoria: "algarrobo", disponible: true },
-  { id: "m8", nombre: "Mate Algarrobo 04", slug: "mate-algarrobo-04", categoryId: "mates", subcategoria: "algarrobo", disponible: true },
+  // Mates de calabaza
+  { id: "mc1", name: "Mate Calabaza 01", slug: "mate-calabaza-01", category: "mates", subcategory: "calabaza", galleryImages: [], available: true },
+  { id: "mc2", name: "Mate Calabaza 02", slug: "mate-calabaza-02", category: "mates", subcategory: "calabaza", galleryImages: [], available: true },
+  { id: "mc3", name: "Mate Calabaza 03", slug: "mate-calabaza-03", category: "mates", subcategory: "calabaza", galleryImages: [], available: true },
+  { id: "mc4", name: "Mate Calabaza 04", slug: "mate-calabaza-04", category: "mates", subcategory: "calabaza", galleryImages: [], available: false },
+  // Mates de algarrobo
+  { id: "ma1", name: "Mate Algarrobo 01", slug: "mate-algarrobo-01", category: "mates", subcategory: "algarrobo", galleryImages: [], available: true },
+  { id: "ma2", name: "Mate Algarrobo 02", slug: "mate-algarrobo-02", category: "mates", subcategory: "algarrobo", galleryImages: [], available: true },
+  { id: "ma3", name: "Mate Algarrobo 03", slug: "mate-algarrobo-03", category: "mates", subcategory: "algarrobo", galleryImages: [], available: true },
+  { id: "ma4", name: "Mate Algarrobo 04", slug: "mate-algarrobo-04", category: "mates", subcategory: "algarrobo", galleryImages: [], available: true },
   // Bombillas
-  { id: "b1", nombre: "Bombilla 01", slug: "bombilla-01", categoryId: "bombillas", disponible: true },
+  { id: "b1", name: "Bombilla 01", slug: "bombilla-01", category: "bombillas", galleryImages: [], available: true },
   // Materos
-  { id: "ma1", nombre: "Matero 01", slug: "matero-01", categoryId: "materos", disponible: true },
-  { id: "ma2", nombre: "Matero 02", slug: "matero-02", categoryId: "materos", disponible: true },
+  { id: "mt1", name: "Matero 01", slug: "matero-01", category: "materos", galleryImages: [], available: true },
+  { id: "mt2", name: "Matero 02", slug: "matero-02", category: "materos", galleryImages: [], available: true },
   // Termos
-  { id: "t1", nombre: "Termo 01", slug: "termo-01", categoryId: "termos", disponible: true },
+  { id: "t1", name: "Termo 01", slug: "termo-01", category: "termos", galleryImages: [], available: true },
   // Combos
-  { id: "c1", nombre: "Combo 01", slug: "combo-01", categoryId: "combos", disponible: true },
-  { id: "c2", nombre: "Combo 02", slug: "combo-02", categoryId: "combos", disponible: true },
-  { id: "c3", nombre: "Combo 03", slug: "combo-03", categoryId: "combos", disponible: false },
-  { id: "c4", nombre: "Combo 04", slug: "combo-04", categoryId: "combos", disponible: true },
+  { id: "c1", name: "Combo 01", slug: "combo-01", category: "combos", galleryImages: [], available: true },
+  { id: "c2", name: "Combo 02", slug: "combo-02", category: "combos", galleryImages: [], available: true },
+  { id: "c3", name: "Combo 03", slug: "combo-03", category: "combos", galleryImages: [], available: false },
+  { id: "c4", name: "Combo 04", slug: "combo-04", category: "combos", galleryImages: [], available: true },
 ];
 
-export function getProductsByCategory(categoryId: string): CatalogProduct[] {
-  return products.filter((p) => p.categoryId === categoryId);
+export function getSubcategoriesByCategory(categoryId: string): CatalogSubcategory[] {
+  return subcategories.filter((s) => s.categoryId === categoryId);
 }
 
-export function getProductsBySubcategory(
-  categoryId: string,
-  subcategoria: string
-): CatalogProduct[] {
-  return products.filter(
-    (p) => p.categoryId === categoryId && p.subcategoria === subcategoria
-  );
+export function getProductsByCategory(categoryId: string): CatalogProduct[] {
+  return products.filter((p) => p.category === categoryId);
+}
+
+export function getProductsBySubcategory(categoryId: string, subcategoryKey: string): CatalogProduct[] {
+  return products.filter((p) => p.category === categoryId && p.subcategory === subcategoryKey);
 }
 
 export function getCategory(slug: string): CatalogCategory | undefined {
   return categories.find((c) => c.slug === slug);
 }
 
-export function getProductBySlug(slug: string): CatalogProduct | undefined {
-  return products.find((p) => p.slug === slug);
+export function getSubcategory(slug: string): CatalogSubcategory | undefined {
+  return subcategories.find((s) => s.slug === slug);
 }
 
-export function subcategoriasPorCategoria(
-  categoryId: string
-): { key: string; label: string }[] {
-  const mapa: Record<string, { key: string; label: string }[]> = {
-    mates: [
-      { key: "calabaza", label: "Calabaza" },
-      { key: "algarrobo", label: "Algarrobo" },
-    ],
-  };
-  return mapa[categoryId] ?? [];
+export function getProductBySlug(slug: string): CatalogProduct | undefined {
+  return products.find((p) => p.slug === slug);
 }

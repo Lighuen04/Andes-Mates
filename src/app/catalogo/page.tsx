@@ -1,5 +1,5 @@
-import CategoryCard from "@/components/CategoryCard";
 import SectionTitle from "@/components/SectionTitle";
+import CategoryCard from "@/components/CategoryCard";
 import { categories } from "@/data/catalog";
 
 export default function CatalogoPage() {

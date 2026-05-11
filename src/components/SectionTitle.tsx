@@ -1,3 +1,7 @@
+"use client";
+
+import { motion } from "framer-motion";
+
 interface Props {
   title: string;
   subtitle?: string;
@@ -5,7 +9,13 @@ interface Props {
 
 export default function SectionTitle({ title, subtitle }: Props) {
   return (
-    <div className="text-center mb-12">
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
+      className="text-center mb-12"
+    >
       <h2 className="text-3xl md:text-4xl font-light tracking-wider text-andes-black">
         {title}
       </h2>
@@ -15,6 +25,6 @@ export default function SectionTitle({ title, subtitle }: Props) {
         </p>
       )}
       <div className="mx-auto mt-4 h-px w-16 bg-andes-ice" />
-    </div>
+    </motion.div>
   );
 }
