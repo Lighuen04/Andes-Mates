@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+  --color-andes-black: #0B0F14;
+  --color-andes-blue: #0F3A5F;
+  --color-andes-ice: #2F6F9F;
+  --color-andes-mountain: #4B5563;
+  --color-andes-snow: #E5E7EB;
+  --color-andes-white: #F8FAFC;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-andes-white);
+  color: var(--color-andes-black);
+}
