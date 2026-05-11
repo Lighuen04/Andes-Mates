@@ -1,39 +1,30 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import ProductForm from "@/components/ProductForm";
 import type { Product } from "@/types/product";
 
 export default function EditarProductoPage() {
-  const [session, setSession] = useState(false);
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
   const params = useParams();
   const supabase = createClient();
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session: s } }) => {
-      if (!s) {
-        router.push("/admin");
-        return;
-      }
-      setSession(true);
-
-      const { data } = await supabase
-        .from("products")
-        .select("*")
-        .eq("id", params.id)
-        .single();
-
-      setProduct(data);
-      setLoading(false);
-    });
+    supabase
+      .from("products")
+      .select("*")
+      .eq("id", params.id)
+      .single()
+      .then(({ data }) => {
+        setProduct(data);
+        setLoading(false);
+      });
   }, []);
 
-  if (!session || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-andes-white">
         <p className="text-andes-mountain text-sm uppercase tracking-widest">

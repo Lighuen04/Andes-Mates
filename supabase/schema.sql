@@ -66,6 +66,29 @@ CREATE POLICY "Admin delete products"
   USING (auth.role() = 'authenticated');
 
 ------------------------------------------------------------
+------------------------------------------------------------
+-- Admin profiles table
+-- Each admin user must have a row here to access /admin
+CREATE TABLE IF NOT EXISTS public.admin_profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  username TEXT UNIQUE NOT NULL,
+  role TEXT NOT NULL DEFAULT 'admin',
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.admin_profiles ENABLE ROW LEVEL SECURITY;
+
+-- Authenticated users can read only their own admin profile
+CREATE POLICY "Users can read own admin profile"
+  ON public.admin_profiles
+  FOR SELECT
+  USING (auth.uid() = id);
+
+-- Only service role can insert/update/delete admin_profiles
+-- (done manually from Supabase Dashboard or via service_role key)
+
+------------------------------------------------------------
 -- Storage bucket setup (run in Supabase Dashboard > Storage)
 -- 1. Create a bucket named "product-images"
 -- 2. Set it to public

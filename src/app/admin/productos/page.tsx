@@ -11,19 +11,11 @@ import { formatPrecio } from "@/lib/utils";
 export default function AdminProductosPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [session, setSession] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
-      if (!s) {
-        router.push("/admin");
-        return;
-      }
-      setSession(true);
-      loadProducts();
-    });
+    loadProducts();
   }, []);
 
   const loadProducts = async () => {
@@ -43,7 +35,7 @@ export default function AdminProductosPage() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.push("/admin");
+    router.push("/admin/login");
   };
 
   const toggleDestacado = async (product: Product) => {
@@ -62,7 +54,7 @@ export default function AdminProductosPage() {
     loadProducts();
   };
 
-  if (!session || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-andes-white">
         <p className="text-andes-mountain text-sm uppercase tracking-widest">
