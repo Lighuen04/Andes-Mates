@@ -1,10 +1,10 @@
 import Breadcrumbs from "@/components/Breadcrumbs";
 import SectionTitle from "@/components/SectionTitle";
 import ProductCard from "@/components/ProductCard";
-import { getProductsBySubcategory } from "@/data/catalog";
+import { getCatalogProductsBySubcategory } from "@/lib/data";
 
-export default function CalabazaPage() {
-  const items = getProductsBySubcategory("mates", "calabaza");
+export default async function CalabazaPage() {
+  const items = await getCatalogProductsBySubcategory("mates", "calabaza");
 
   return (
     <div className="min-h-screen py-16">

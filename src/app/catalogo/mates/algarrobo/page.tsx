@@ -1,10 +1,10 @@
 import Breadcrumbs from "@/components/Breadcrumbs";
 import SectionTitle from "@/components/SectionTitle";
 import ProductCard from "@/components/ProductCard";
-import { getProductsBySubcategory } from "@/data/catalog";
+import { getCatalogProductsBySubcategory } from "@/lib/data";
 
-export default function AlgarroboPage() {
-  const items = getProductsBySubcategory("mates", "algarrobo");
+export default async function AlgarroboPage() {
+  const items = await getCatalogProductsBySubcategory("mates", "algarrobo");
 
   return (
     <div className="min-h-screen py-16">

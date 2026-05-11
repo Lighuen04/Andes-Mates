@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ProductGallery from "@/components/ProductGallery";
-import { getProductBySlug } from "@/data/catalog";
+import { getCatalogProductBySlug } from "@/lib/data";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -9,8 +9,8 @@ interface Props {
 
 export default async function TermoProductoPage({ params }: Props) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
-  if (!product || product.category !== "termos") notFound();
+  const product = await getCatalogProductBySlug(slug);
+  if (!product) notFound();
 
   return (
     <div className="min-h-screen py-16">

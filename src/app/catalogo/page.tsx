@@ -1,8 +1,10 @@
 import SectionTitle from "@/components/SectionTitle";
 import CategoryCard from "@/components/CategoryCard";
-import { categories } from "@/data/catalog";
+import { getCatalogCategories } from "@/lib/data";
 
-export default function CatalogoPage() {
+export default async function CatalogoPage() {
+  const categories = await getCatalogCategories();
+
   return (
     <div className="min-h-screen py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

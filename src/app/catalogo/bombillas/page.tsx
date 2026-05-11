@@ -1,10 +1,10 @@
 import Breadcrumbs from "@/components/Breadcrumbs";
 import SectionTitle from "@/components/SectionTitle";
 import ProductCard from "@/components/ProductCard";
-import { getProductsByCategory } from "@/data/catalog";
+import { getCatalogProductsByCategory } from "@/lib/data";
 
-export default function BombillasPage() {
-  const items = getProductsByCategory("bombillas");
+export default async function BombillasPage() {
+  const items = await getCatalogProductsByCategory("bombillas");
 
   return (
     <div className="min-h-screen py-16">

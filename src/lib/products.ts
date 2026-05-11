@@ -1,5 +1,5 @@
 import { createClient } from "./supabase/server";
-import type { Product, ProductFormData, Categoria } from "@/types/product";
+import type { Product, ProductFormData } from "@/types/product";
 
 export async function getProducts(): Promise<Product[]> {
   const supabase = await createClient();
@@ -7,7 +7,6 @@ export async function getProducts(): Promise<Product[]> {
     .from("products")
     .select("*")
     .order("created_at", { ascending: false });
-
   return data ?? [];
 }
 
@@ -18,7 +17,6 @@ export async function getPublishedProducts(): Promise<Product[]> {
     .select("*")
     .eq("disponible", true)
     .order("created_at", { ascending: false });
-
   return data ?? [];
 }
 
@@ -30,36 +28,42 @@ export async function getFeaturedProducts(): Promise<Product[]> {
     .eq("destacado", true)
     .eq("disponible", true)
     .order("created_at", { ascending: false });
-
   return data ?? [];
 }
 
-export async function getProductsByCategoria(
-  categoria: string
+export async function getProductsByCategory(
+  categoryId: string
 ): Promise<Product[]> {
-  if (categoria === "todas") return getPublishedProducts();
-
   const supabase = await createClient();
   const { data } = await supabase
     .from("products")
     .select("*")
-    .eq("categoria", categoria)
+    .eq("category_id", categoryId)
     .eq("disponible", true)
     .order("created_at", { ascending: false });
-
   return data ?? [];
 }
 
-export async function getProductBySlug(
-  slug: string
-): Promise<Product | null> {
+export async function getProductsBySubcategory(
+  subcategoryId: string
+): Promise<Product[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("products")
+    .select("*")
+    .eq("subcategory_id", subcategoryId)
+    .eq("disponible", true)
+    .order("created_at", { ascending: false });
+  return data ?? [];
+}
+
+export async function getProductBySlug(slug: string): Promise<Product | null> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("products")
     .select("*")
     .eq("slug", slug)
     .single();
-
   return data;
 }
 
@@ -70,7 +74,6 @@ export async function getProductById(id: string): Promise<Product | null> {
     .select("*")
     .eq("id", id)
     .single();
-
   return data;
 }
 
@@ -78,7 +81,6 @@ export async function createProduct(
   formData: ProductFormData
 ): Promise<Product | null> {
   const supabase = await createClient();
-
   const slug =
     formData.slug ??
     formData.nombre
@@ -86,13 +88,11 @@ export async function createProduct(
       .replace(/[^\w\s-]/g, "")
       .replace(/[\s_]+/g, "-")
       .replace(/-+/g, "-");
-
   const { data } = await supabase
     .from("products")
     .insert({ ...formData, slug })
     .select()
     .single();
-
   return data;
 }
 
@@ -107,7 +107,6 @@ export async function updateProduct(
     .eq("id", id)
     .select()
     .single();
-
   return data;
 }
 

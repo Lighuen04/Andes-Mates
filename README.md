@@ -25,16 +25,6 @@ cd andes-mates
 npm install
 ```
 
-## Configuración de Supabase
-
-1. Crear un proyecto en [Supabase](https://supabase.com/).
-2. Ir a **SQL Editor** y ejecutar el contenido de `supabase/schema.sql` para crear la tabla `products`, `admin_profiles` y las políticas de seguridad.
-3. Ir a **Storage** y crear un bucket público llamado `product-images`.
-4. En **Storage > Policies**, agregar las siguientes políticas:
-   - **SELECT pública**: permitir lectura pública del bucket `product-images`.
-   - **INSERT autenticado**: permitir inserción solo a usuarios autenticados.
-5. Ir a **Authentication > Settings** y habilitar el proveedor **Email/Password**.
-
 ## Variables de entorno
 
 Copiar el archivo `.env.example` a `.env.local` y completar los valores:
@@ -48,28 +38,60 @@ cp .env.example .env.local
 | `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto (Settings > API > Project URL) |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anon key (Settings > API > Anon key) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Service role key (Settings > API > Service role) |
-| `NEXT_PUBLIC_WHATSAPP_NUMBER` | Número de WhatsApp con código de país (ej: 5491123456789) |
-| `NEXT_PUBLIC_INSTAGRAM_URL` | URL completa del perfil de Instagram (ej: https://instagram.com/andesmates) |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | Número de WhatsApp con código de país (ej: 5492942530736) |
+| `NEXT_PUBLIC_INSTAGRAM_URL` | URL completa del perfil de Instagram |
 
-## Desarrollo
+> **Importante:** No subir `.env.local` al repositorio (ya está en `.gitignore`).
 
-```bash
-npm run dev
+## Configuración de Supabase
+
+### 1. Ejecutar el schema
+
+Ir a **SQL Editor** en Supabase Dashboard y ejecutar el contenido de `supabase/schema.sql`.
+
+Esto crea todas las tablas necesarias:
+- `products` — Productos del catálogo
+- `categories` — Categorías dinámicas
+- `subcategories` — Subcategorías
+- `product_images` — Galería de fotos por producto
+- `site_settings` — Configuración del sitio (imagen del hero, etc.)
+- `admin_profiles` — Perfiles de administradores
+
+### 2. Crear buckets de Storage
+
+Ir a **Storage** en Supabase Dashboard y crear los siguientes buckets **públicos**:
+
+| Bucket | Uso |
+|---|---|
+| `product-images` | Fotos de productos |
+| `category-images` | Imágenes de categorías |
+| `site-images` | Imágenes del sitio (fondo del hero) |
+
+Para cada bucket, agregar las siguientes políticas en **Storage > Policies**:
+
+```sql
+-- Lectura pública
+CREATE POLICY "Public read BUCKET_NAME"
+  ON storage.objects
+  FOR SELECT
+  USING (bucket_id = 'BUCKET_NAME');
+
+-- Subida solo para autenticados
+CREATE POLICY "Admin upload BUCKET_NAME"
+  ON storage.objects
+  FOR INSERT
+  WITH CHECK (bucket_id = 'BUCKET_NAME' AND auth.role() = 'authenticated');
+
+-- Eliminación solo para autenticados
+CREATE POLICY "Admin delete BUCKET_NAME"
+  ON storage.objects
+  FOR DELETE
+  USING (bucket_id = 'BUCKET_NAME' AND auth.role() = 'authenticated');
 ```
 
-Abrir [http://localhost:3000](http://localhost:3000).
+### 3. Habilitar autenticación
 
-## Admin
-
-Ir a `/admin/login` e iniciar sesión con un usuario administrador.
-
-Desde el panel se pueden:
-- Ver listado de productos
-- Crear nuevos productos (con imagen)
-- Editar productos existentes
-- Eliminar productos
-- Marcar como disponible / no disponible
-- Marcar como destacado / no destacado
+Ir a **Authentication > Settings** y habilitar el proveedor **Email/Password**.
 
 ## Crear usuarios administradores
 
@@ -103,42 +125,119 @@ values
 ('UUID_DEL_USUARIO_2', 'Lighuen04', 'admin', true);
 ```
 
-> **Importante**: Reemplazar `UUID_DEL_USUARIO_1` y `UUID_DEL_USUARIO_2` por los IDs reales que aparecen en la tabla `auth.users` (los puedes ver en Authentication > Users, columna ID).
+> **Importante:** Reemplazar `UUID_DEL_USUARIO_1` y `UUID_DEL_USUARIO_2` por los IDs reales que aparecen en Authentication > Users (columna ID).
 
-### Notas de seguridad
+## Desarrollo
 
-- No escribir contraseñas en `schema.sql`.
-- No subir `.env.local` a GitHub (ya está en `.gitignore`).
-- Las contraseñas se gestionan exclusivamente desde Supabase Auth.
-- El login valida que el usuario exista en `admin_profiles` con `role = 'admin'` e `is_active = true`.
+```bash
+npm run dev
+```
+
+Abrir [http://localhost:3000](http://localhost:3000).
+
+## Admin
+
+Ir a `/admin/login` e iniciar sesión con un usuario administrador.
+
+Se puede ingresar con:
+- **Email**: `alepelitoculo@andesmates.local` (o el email configurado)
+- **Usuario**: `alepelitoculo` (el sistema resuelve automáticamente el email asociado)
+
+### Funcionalidades del panel
+
+#### Productos (`/admin/productos`)
+- Ver listado de productos con stock, precio, disponibilidad
+- Crear nuevos productos con imágenes
+- Editar productos existentes
+- Elegir categoría y subcategoría
+- Subir múltiples fotos
+- Elegir foto principal
+- Modificar stock
+- Activar/desactivar disponible
+- Marcar como destacado
+- Eliminar productos
+
+#### Categorías (`/admin/catalogo/categorias`)
+- Crear categorías con nombre, slug, descripción e imagen
+- Editar categorías existentes
+- Activar/desactivar categorías
+- Crear subcategorías dentro de cada categoría
+- Eliminar categorías (con subcategorías asociadas)
+
+#### Configuración (`/admin/configuracion`)
+- Subir o cambiar la imagen de fondo del Hero de la página principal
+- La imagen se guarda en el bucket `site-images`
+- La URL se almacena en `site_settings` con clave `hero_background`
+- Si no hay imagen, se muestra el degradado por defecto
+
+### Fotos de productos
+
+- Cada producto puede tener múltiples fotos en la galería
+- Una foto puede marcarse como **principal** (aparece en las cards del catálogo público)
+- Todas las fotos aparecen en la galería del producto en la página pública
+- Si no hay fotos, se muestra un placeholder "Foto pendiente"
+
+### Seguridad
+
+- Las rutas `/admin/*` están protegidas por middleware
+- Solo usuarios autenticados en Supabase Auth pueden acceder
+- Se verifica que el usuario exista en `admin_profiles` con `role = 'admin'` e `is_active = true`
+- Usuarios sin permisos ven "Acceso denegado"
+- Las contraseñas se gestionan exclusivamente desde Supabase Auth
+- No hay contraseñas hardcodeadas en el código
+- `SUPABASE_SERVICE_ROLE_KEY` solo se usa en el servidor, nunca en el navegador
+
+## WhatsApp
+
+El botón de WhatsApp usa el número configurado en `NEXT_PUBLIC_WHATSAPP_NUMBER`.
+
+En productos, el mensaje precargado es:
+```
+Hola, quiero consultar por: [nombre del producto]
+```
 
 ## Deploy en Vercel
 
 1. Subir el proyecto a GitHub.
 2. Crear un proyecto en [Vercel](https://vercel.com/) y conectarlo con el repositorio.
 3. En Vercel, ir a **Settings > Environment Variables** y agregar todas las variables de `.env.local`.
-4. Desplegar.
-
-La variable `SUPABASE_SERVICE_ROLE_KEY` se usa en el servidor para operaciones admin. En Vercel, asegurarse de marcarla como sensitive.
+4. Marcar `SUPABASE_SERVICE_ROLE_KEY` como sensitive.
+5. Desplegar.
 
 ## Estructura del proyecto
 
 ```
 src/
-  app/                    # Páginas (App Router)
+  app/
     page.tsx              # Home
-    admin/                # Panel de administración
-      login/              # Login
+    admin/
+      login/              # Login de administradores
+      page.tsx            # Redirige a /admin/productos
+      layout.tsx          # Layout con verificación de permisos
       productos/          # CRUD de productos
-      catalogo/           # Gestión de catálogo
-      configuracion/      # Configuración del sitio
-    catalogo/             # Catálogo público
+        page.tsx          # Listado
+        nuevo/            # Crear producto
+        [id]/             # Editar producto
+      catalogo/
+        categorias/       # Gestión de categorías
+      configuracion/      # Configuración del sitio (hero)
+    catalogo/             # Catálogo público (lee desde Supabase)
+    api/
+      resolve-username/   # API para resolver usuario → email
   components/             # Componentes reutilizables
-  lib/                    # Lógica de negocio
-    supabase/             # Clientes de Supabase
+  lib/
+    supabase/             # Clientes de Supabase (server, client)
+    data.ts               # Función de datos con fallback a catalog.ts
     products.ts           # Funciones para productos
+    categories.ts         # Funciones para categorías y subcategorías
+    product-images.ts     # Funciones para galería de fotos
+    site-settings.ts      # Funciones para configuración del sitio
     utils.ts              # Utilidades generales
-  types/                  # Tipos de TypeScript
+  types/
+    product.ts            # Tipo Product
+    site.ts               # Tipos Category, Subcategory, ProductImage, SiteSetting
+  data/
+    catalog.ts            # Datos de catálogo hardcodeados (fallback)
 supabase/
   schema.sql              # Esquema de base de datos y políticas RLS
 middleware.ts             # Protección de rutas del admin
@@ -147,6 +246,6 @@ middleware.ts             # Protección de rutas del admin
 ## Personalización
 
 - **Colores**: editarlos en `src/app/globals.css` en el bloque `@theme`.
-- **WhatsApp**: cambiar el mensaje precargado en `src/lib/utils.ts` función `getWhatsAppLink`.
-- **Número de WhatsApp**: cambiarlo desde la variable de entorno `NEXT_PUBLIC_WHATSAPP_NUMBER`.
+- **WhatsApp**: cambiar el número desde `NEXT_PUBLIC_WHATSAPP_NUMBER`.
 - **Instagram**: cambiar la URL desde `NEXT_PUBLIC_INSTAGRAM_URL`.
+- **Hero**: subir imagen de fondo desde `/admin/configuracion`.

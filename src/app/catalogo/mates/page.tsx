@@ -2,10 +2,10 @@ import Link from "next/link";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import SectionTitle from "@/components/SectionTitle";
 import ImagePlaceholder from "@/components/ImagePlaceholder";
-import { getSubcategoriesByCategory } from "@/data/catalog";
+import { getCatalogSubcategories } from "@/lib/data";
 
-export default function MatesPage() {
-  const subs = getSubcategoriesByCategory("mates");
+export default async function MatesPage() {
+  const subs = await getCatalogSubcategories("mates");
 
   return (
     <div className="min-h-screen py-16">
