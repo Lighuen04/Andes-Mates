@@ -1,24 +1,14 @@
 import { createClient } from "./supabase/server";
 import type { SiteSetting } from "@/types/site";
 
-export async function getSiteSetting(key: string): Promise<string | null> {
+export async function getHeroBackground(): Promise<string | null> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("site_settings")
-    .select("value")
-    .eq("key", key)
+    .select("hero_background_url")
+    .eq("id", "main")
     .single();
-  return data?.value ?? null;
-}
-
-export async function upsertSiteSetting(key: string, value: string): Promise<SiteSetting | null> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("site_settings")
-    .upsert({ key, value }, { onConflict: "key" })
-    .select()
-    .single();
-  return data;
+  return data?.hero_background_url || null;
 }
 
 export async function getAllSiteSettings(): Promise<SiteSetting[]> {
@@ -26,6 +16,6 @@ export async function getAllSiteSettings(): Promise<SiteSetting[]> {
   const { data } = await supabase
     .from("site_settings")
     .select("*")
-    .order("key");
+    .order("id");
   return data ?? [];
 }

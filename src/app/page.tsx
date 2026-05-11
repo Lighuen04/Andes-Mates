@@ -4,11 +4,11 @@ import SectionTitle from "@/components/SectionTitle";
 import HistorySection from "@/components/HistorySection";
 import ContactSection from "@/components/ContactSection";
 import { getCatalogCategories } from "@/lib/data";
-import { getSiteSetting } from "@/lib/site-settings";
+import { getHeroBackground } from "@/lib/site-settings";
 
 export default async function HomePage() {
   const categories = await getCatalogCategories();
-  const heroBg = await getSiteSetting("hero_background");
+  const heroBg = await getHeroBackground();
 
   return (
     <>

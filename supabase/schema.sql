@@ -74,12 +74,12 @@ CREATE INDEX IF NOT EXISTS idx_product_images_product ON product_images (product
 CREATE INDEX IF NOT EXISTS idx_product_images_primary ON product_images (product_id, is_primary) WHERE is_primary = true;
 
 -- ============================================================
--- SITE SETTINGS (key-value store for hero image, etc.)
+-- SITE SETTINGS (hero background, etc.)
+-- The row with id = 'main' stores the hero_background_url
 -- ============================================================
 CREATE TABLE IF NOT EXISTS site_settings (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  key TEXT UNIQUE NOT NULL,
-  value TEXT NOT NULL,
+  id TEXT PRIMARY KEY DEFAULT 'main',
+  hero_background_url TEXT NOT NULL DEFAULT '',
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

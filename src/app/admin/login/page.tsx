@@ -17,64 +17,58 @@ export default function AdminLoginPage() {
     setError("");
     setLoading(true);
 
-    let email = input;
+    try {
+      let email = input.trim();
 
-    if (!email.includes("@")) {
-      const res = await fetch("/api/resolve-username", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: email }),
+      if (!email.includes("@")) {
+        email = `${email.toLowerCase()}@andesmates.local`;
+      }
+
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
 
-      if (!res.ok) {
-        setError("Usuario no encontrado");
+      if (signInError) {
+        console.error("Login error:", signInError);
+        setError("Usuario o contraseña incorrectos");
         setLoading(false);
         return;
       }
 
-      const data = await res.json();
-      email = data.email;
-    }
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData?.session) {
+        setError("Error al iniciar sesión");
+        setLoading(false);
+        return;
+      }
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+      const { data: profile } = await supabase
+        .from("admin_profiles")
+        .select("*")
+        .eq("id", sessionData.session.user.id)
+        .single();
 
-    if (signInError) {
-      setError("Credenciales incorrectas. Intentá de nuevo.");
-      setLoading(false);
-      return;
-    }
+      if (!profile) {
+        await supabase.auth.signOut();
+        setError("No tenés permisos de administrador");
+        setLoading(false);
+        return;
+      }
 
-    const { data: sessionData } = await supabase.auth.getSession();
-    if (!sessionData.session) {
+      if (!profile.is_active) {
+        await supabase.auth.signOut();
+        setError("El usuario administrador está desactivado");
+        setLoading(false);
+        return;
+      }
+
+      router.push("/admin/productos");
+    } catch (err) {
+      console.error("Login error:", err);
       setError("Error al iniciar sesión");
       setLoading(false);
-      return;
     }
-
-    const { data: profile } = await supabase
-      .from("admin_profiles")
-      .select("*")
-      .eq("id", sessionData.session.user.id)
-      .single();
-
-    if (!profile) {
-      await supabase.auth.signOut();
-      setError("Usuario sin permisos de administrador");
-      setLoading(false);
-      return;
-    }
-
-    if (!profile.is_active) {
-      await supabase.auth.signOut();
-      setError("Usuario desactivado");
-      setLoading(false);
-      return;
-    }
-
-    router.push("/admin/productos");
   };
 
   return (

@@ -31,8 +31,7 @@ export interface ProductImage {
 
 export interface SiteSetting {
   id: string;
-  key: string;
-  value: string;
+  hero_background_url: string;
   updated_at: string;
 }
 

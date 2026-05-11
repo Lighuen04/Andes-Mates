@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 export default function AdminConfiguracionPage() {
   const supabase = createClient();
   const [heroFile, setHeroFile] = useState<File | null>(null);
-  const [heroUrl, setHeroUrl] = useState<string>("");
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [preview, setPreview] = useState<string | null>(null);
@@ -14,66 +13,90 @@ export default function AdminConfiguracionPage() {
   useEffect(() => {
     supabase
       .from("site_settings")
-      .select("value")
-      .eq("key", "hero_background")
+      .select("hero_background_url")
+      .eq("id", "main")
       .single()
       .then(({ data }) => {
-        if (data) {
-          setHeroUrl(data.value);
-          setPreview(data.value);
+        if (data?.hero_background_url) {
+          setPreview(data.hero_background_url);
         }
       });
   }, []);
 
-  const handleUpload = useCallback(async () => {
+  const handleUpload = async () => {
     if (!heroFile) return;
     setSaving(true);
     setMessage("");
 
-    const fileExt = heroFile.name.split(".").pop();
-    const fileName = `hero-${Date.now()}.${fileExt}`;
+    try {
+      const fileExt = heroFile.name.split(".").pop();
+      const filePath = `hero-${Date.now()}.${fileExt}`;
 
-    const { error: uploadError } = await supabase.storage
-      .from("site-images")
-      .upload(fileName, heroFile, { upsert: true });
+      const { error: uploadError } = await supabase.storage
+        .from("site-images")
+        .upload(filePath, heroFile, { upsert: true });
 
-    if (uploadError) {
-      setMessage("Error al subir la imagen");
-      setSaving(false);
-      return;
-    }
+      if (uploadError) {
+        console.error("Error al subir imagen:", uploadError);
+        setMessage(`Error al subir la imagen: ${uploadError.message}`);
+        setSaving(false);
+        return;
+      }
 
-    const { data: urlData } = supabase.storage
-      .from("site-images")
-      .getPublicUrl(fileName);
+      const { data: publicUrlData } = supabase.storage
+        .from("site-images")
+        .getPublicUrl(filePath);
 
-    const publicUrl = urlData.publicUrl;
-    setPreview(publicUrl);
-    setHeroFile(null);
+      const heroBackgroundUrl = publicUrlData.publicUrl;
+      setPreview(heroBackgroundUrl);
+      setHeroFile(null);
 
-    const { error: dbError } = await supabase
-      .from("site_settings")
-      .upsert({ key: "hero_background", value: publicUrl }, { onConflict: "key" });
+      const { error: settingsError } = await supabase
+        .from("site_settings")
+        .upsert({
+          id: "main",
+          hero_background_url: heroBackgroundUrl,
+          updated_at: new Date().toISOString(),
+        });
 
-    if (dbError) {
-      setMessage("Error al guardar la configuración");
-    } else {
-      setMessage("Imagen de fondo actualizada correctamente");
+      if (settingsError) {
+        console.error("Error al actualizar site_settings:", settingsError);
+        setMessage(`Error al actualizar configuración: ${settingsError.message}`);
+      } else {
+        setMessage("Configuración guardada correctamente");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      setMessage("Error al actualizar configuración");
     }
     setSaving(false);
-  }, [heroFile]);
+  };
 
   const handleRemove = async () => {
     setSaving(true);
     setMessage("");
-    setPreview(null);
-    setHeroUrl("");
 
-    await supabase
-      .from("site_settings")
-      .upsert({ key: "hero_background", value: "" }, { onConflict: "key" });
+    try {
+      setPreview(null);
 
-    setMessage("Imagen de fondo eliminada. Se usará el degradado por defecto.");
+      const { error: settingsError } = await supabase
+        .from("site_settings")
+        .upsert({
+          id: "main",
+          hero_background_url: "",
+          updated_at: new Date().toISOString(),
+        });
+
+      if (settingsError) {
+        console.error("Error al actualizar site_settings:", settingsError);
+        setMessage(`Error al actualizar configuración: ${settingsError.message}`);
+      } else {
+        setMessage("Configuración guardada correctamente");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      setMessage("Error al actualizar configuración");
+    }
     setSaving(false);
   };
 
