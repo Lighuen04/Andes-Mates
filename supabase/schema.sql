@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS products (
   nombre TEXT NOT NULL,
   slug TEXT NOT NULL UNIQUE,
   descripcion TEXT NOT NULL DEFAULT '',
-  categoria TEXT NOT NULL CHECK (categoria IN ('calabaza', 'madera', 'ceramica', 'kit', 'accesorio')),
+  categoria TEXT NOT NULL CHECK (categoria IN ('calabaza', 'algarrobo', 'bombilla', 'bombillón', 'combo', 'termo', 'accesorio')),
   precio DECIMAL(10, 2),
   mostrar_precio BOOLEAN NOT NULL DEFAULT true,
   disponible BOOLEAN NOT NULL DEFAULT true,
