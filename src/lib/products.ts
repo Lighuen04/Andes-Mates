@@ -1,4 +1,5 @@
 import { createClient } from "./supabase/server";
+import { slugify } from "@/lib/utils";
 import type { Product, ProductFormData } from "@/types/product";
 
 export async function getProducts(): Promise<Product[]> {
@@ -15,7 +16,7 @@ export async function getPublishedProducts(): Promise<Product[]> {
   const { data } = await supabase
     .from("products")
     .select("*")
-    .eq("disponible", true)
+    .eq("available", true)
     .order("created_at", { ascending: false });
   return data ?? [];
 }
@@ -25,8 +26,8 @@ export async function getFeaturedProducts(): Promise<Product[]> {
   const { data } = await supabase
     .from("products")
     .select("*")
-    .eq("destacado", true)
-    .eq("disponible", true)
+    .eq("is_active", true)
+    .eq("available", true)
     .order("created_at", { ascending: false });
   return data ?? [];
 }
@@ -39,7 +40,7 @@ export async function getProductsByCategory(
     .from("products")
     .select("*")
     .eq("category_id", categoryId)
-    .eq("disponible", true)
+    .eq("available", true)
     .order("created_at", { ascending: false });
   return data ?? [];
 }
@@ -52,7 +53,7 @@ export async function getProductsBySubcategory(
     .from("products")
     .select("*")
     .eq("subcategory_id", subcategoryId)
-    .eq("disponible", true)
+    .eq("available", true)
     .order("created_at", { ascending: false });
   return data ?? [];
 }
@@ -81,13 +82,7 @@ export async function createProduct(
   formData: ProductFormData
 ): Promise<Product | null> {
   const supabase = await createClient();
-  const slug =
-    formData.slug ??
-    formData.nombre
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/[\s_]+/g, "-")
-      .replace(/-+/g, "-");
+  const slug = formData.slug ?? slugify(formData.name);
   const { data } = await supabase
     .from("products")
     .insert({ ...formData, slug })

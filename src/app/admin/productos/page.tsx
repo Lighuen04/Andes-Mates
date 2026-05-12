@@ -32,18 +32,18 @@ export default function AdminProductosPage() {
     loadProducts();
   };
 
-  const toggleDestacado = async (product: Product) => {
+  const toggleIsActive = async (product: Product) => {
     await supabase
       .from("products")
-      .update({ destacado: !product.destacado })
+      .update({ is_active: !product.is_active })
       .eq("id", product.id);
     loadProducts();
   };
 
-  const toggleDisponible = async (product: Product) => {
+  const toggleAvailable = async (product: Product) => {
     await supabase
       .from("products")
-      .update({ disponible: !product.disponible })
+      .update({ available: !product.available })
       .eq("id", product.id);
     loadProducts();
   };
@@ -84,7 +84,7 @@ export default function AdminProductosPage() {
                 <th className="text-left px-4 py-3 text-[10px] uppercase tracking-widest text-andes-mountain font-medium">Precio</th>
                 <th className="text-center px-4 py-3 text-[10px] uppercase tracking-widest text-andes-mountain font-medium">Stock</th>
                 <th className="text-center px-4 py-3 text-[10px] uppercase tracking-widest text-andes-mountain font-medium">Disponible</th>
-                <th className="text-center px-4 py-3 text-[10px] uppercase tracking-widest text-andes-mountain font-medium">Destacado</th>
+                <th className="text-center px-4 py-3 text-[10px] uppercase tracking-widest text-andes-mountain font-medium">Activo</th>
                 <th className="text-right px-4 py-3 text-[10px] uppercase tracking-widest text-andes-mountain font-medium">Acciones</th>
               </tr>
             </thead>
@@ -92,30 +92,30 @@ export default function AdminProductosPage() {
               {products.map((product) => (
                 <tr key={product.id} className="border-t border-andes-snow hover:bg-andes-snow/20 transition-colors">
                   <td className="px-4 py-3">
-                    {product.imagen_url ? (
-                      <img src={product.imagen_url} alt="" className="w-10 h-10 object-cover" />
+                    {product.primary_image_url ? (
+                      <img src={product.primary_image_url} alt="" className="w-10 h-10 object-cover" />
                     ) : (
                       <div className="w-10 h-10 bg-andes-snow/50" />
                     )}
                   </td>
-                  <td className="px-4 py-3 text-andes-black font-medium">{product.nombre}</td>
+                  <td className="px-4 py-3 text-andes-black font-medium">{product.name}</td>
                   <td className="px-4 py-3 text-andes-mountain text-[10px] uppercase tracking-widest">
-                    {product.categoria || "—"}
+                    {product.category_id || "—"}
                   </td>
                   <td className="px-4 py-3 text-andes-mountain">
-                    {product.mostrar_precio ? formatPrecio(product.precio) : "-"}
+                    {product.show_price ? formatPrecio(product.price) : "-"}
                   </td>
                   <td className="px-4 py-3 text-center text-andes-mountain">{product.stock}</td>
                   <td className="px-4 py-3 text-center">
-                    <button onClick={() => toggleDisponible(product)}
-                      className={`text-[10px] uppercase tracking-widest px-3 py-1 border ${product.disponible ? "text-green-700 border-green-700" : "text-red-600 border-red-600"}`}>
-                      {product.disponible ? "Sí" : "No"}
+                    <button onClick={() => toggleAvailable(product)}
+                      className={`text-[10px] uppercase tracking-widest px-3 py-1 border ${product.available ? "text-green-700 border-green-700" : "text-red-600 border-red-600"}`}>
+                      {product.available ? "Sí" : "No"}
                     </button>
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <button onClick={() => toggleDestacado(product)}
-                      className={`text-[10px] uppercase tracking-widest px-3 py-1 border ${product.destacado ? "text-andes-ice border-andes-ice" : "text-andes-mountain border-andes-snow"}`}>
-                      {product.destacado ? "Sí" : "No"}
+                    <button onClick={() => toggleIsActive(product)}
+                      className={`text-[10px] uppercase tracking-widest px-3 py-1 border ${product.is_active ? "text-andes-ice border-andes-ice" : "text-andes-mountain border-andes-snow"}`}>
+                      {product.is_active ? "Sí" : "No"}
                     </button>
                   </td>
                   <td className="px-4 py-3 text-right">

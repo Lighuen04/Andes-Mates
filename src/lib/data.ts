@@ -34,14 +34,14 @@ function mapDbSubcategoryToCatalog(dbSub: Subcategory, catSlug: string): Catalog
 function mapDbProductToCatalog(dbProd: Product, catSlug: string, subSlug?: string): CatalogProduct {
   return {
     id: dbProd.id,
-    name: dbProd.nombre,
+    name: dbProd.name,
     slug: dbProd.slug,
     category: catSlug as CatalogProduct["category"],
     subcategory: subSlug as CatalogProduct["subcategory"],
-    description: dbProd.descripcion || undefined,
-    imageUrl: dbProd.imagen_url ?? undefined,
+    description: dbProd.description || undefined,
+    imageUrl: dbProd.primary_image_url ?? undefined,
     galleryImages: [],
-    available: dbProd.disponible,
+    available: dbProd.available,
   };
 }
 
@@ -114,7 +114,7 @@ export async function getCatalogProductsByCategory(categorySlug: string): Promis
     .from("products")
     .select("*")
     .eq("category_id", catId)
-    .eq("disponible", true)
+    .eq("available", true)
     .order("created_at", { ascending: false });
 
   if (dbProds && dbProds.length > 0) {
@@ -123,13 +123,13 @@ export async function getCatalogProductsByCategory(categorySlug: string): Promis
       const gallery = await getProductGallery(p.id);
       results.push({
         id: p.id,
-        name: p.nombre,
+        name: p.name,
         slug: p.slug,
         category: categorySlug as CatalogProduct["category"],
-        description: p.descripcion || undefined,
-        imageUrl: gallery[0] ?? p.imagen_url ?? undefined,
+        description: p.description || undefined,
+        imageUrl: gallery[0] ?? p.primary_image_url ?? undefined,
         galleryImages: gallery,
-        available: p.disponible,
+        available: p.available,
       });
     }
     return results;
@@ -163,7 +163,7 @@ export async function getCatalogProductsBySubcategory(
     .from("products")
     .select("*")
     .eq("subcategory_id", sub.id)
-    .eq("disponible", true)
+    .eq("available", true)
     .order("created_at", { ascending: false });
 
   if (dbProds && dbProds.length > 0) {
@@ -202,13 +202,13 @@ export async function getCatalogProductBySlug(slug: string): Promise<CatalogProd
     const gallery = await getProductGallery(dbProd.id);
     return {
       id: dbProd.id,
-      name: dbProd.nombre,
+      name: dbProd.name,
       slug: dbProd.slug,
       category: (dbProd.categories?.slug ?? "mates") as CatalogProduct["category"],
-      description: dbProd.descripcion || undefined,
-      imageUrl: gallery[0] ?? dbProd.imagen_url ?? undefined,
+      description: dbProd.description || undefined,
+      imageUrl: gallery[0] ?? dbProd.primary_image_url ?? undefined,
       galleryImages: gallery,
-      available: dbProd.disponible,
+      available: dbProd.available,
     };
   }
 

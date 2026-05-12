@@ -1,17 +1,17 @@
 export interface Product {
   id: string;
-  nombre: string;
+  name: string;
   slug: string;
-  descripcion: string;
-  categoria: string;
+  description: string | null;
   category_id: string | null;
   subcategory_id: string | null;
-  precio: number | null;
-  mostrar_precio: boolean;
-  disponible: boolean;
-  destacado: boolean;
-  imagen_url: string | null;
+  price: number | null;
+  show_price: boolean;
   stock: number;
+  available: boolean;
+  primary_image_url: string | null;
+  sort_order: number;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
 }

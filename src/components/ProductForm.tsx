@@ -3,12 +3,27 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { slugify } from "@/lib/utils";
 import type { Product, ProductFormData } from "@/types/product";
 import type { Category, Subcategory, ProductImage } from "@/types/site";
 
 interface Props {
   product?: Product | null;
 }
+
+const defaultForm: ProductFormData = {
+  name: "",
+  description: null,
+  category_id: null,
+  subcategory_id: null,
+  price: null,
+  show_price: true,
+  stock: 0,
+  available: true,
+  primary_image_url: null,
+  sort_order: 0,
+  is_active: true,
+};
 
 export default function ProductForm({ product }: Props) {
   const router = useRouter();
@@ -23,19 +38,7 @@ export default function ProductForm({ product }: Props) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const [formData, setFormData] = useState<ProductFormData>({
-    nombre: "",
-    descripcion: "",
-    categoria: "",
-    category_id: null,
-    subcategory_id: null,
-    precio: null,
-    mostrar_precio: true,
-    disponible: true,
-    destacado: false,
-    imagen_url: null,
-    stock: 0,
-  });
+  const [formData, setFormData] = useState<ProductFormData>(defaultForm);
 
   useEffect(() => {
     supabase.from("categories").select("*").order("name").then(({ data }) => {
@@ -61,17 +64,17 @@ export default function ProductForm({ product }: Props) {
   useEffect(() => {
     if (product) {
       setFormData({
-        nombre: product.nombre,
-        descripcion: product.descripcion,
-        categoria: product.categoria,
+        name: product.name,
+        description: product.description,
         category_id: product.category_id,
         subcategory_id: product.subcategory_id,
-        precio: product.precio,
-        mostrar_precio: product.mostrar_precio,
-        disponible: product.disponible,
-        destacado: product.destacado,
-        imagen_url: product.imagen_url,
+        price: product.price,
+        show_price: product.show_price,
         stock: product.stock,
+        available: product.available,
+        primary_image_url: product.primary_image_url,
+        sort_order: product.sort_order,
+        is_active: product.is_active,
       });
       loadImages(product.id);
     }
@@ -88,7 +91,7 @@ export default function ProductForm({ product }: Props) {
   }, []);
 
   const handleImageUpload = async (): Promise<string | null> => {
-    if (newFiles.length === 0) return formData.imagen_url;
+    if (newFiles.length === 0) return formData.primary_image_url;
 
     const file = newFiles[0];
     const fileExt = file.name.split(".").pop();
@@ -115,36 +118,53 @@ export default function ProductForm({ product }: Props) {
     setError("");
     setSaving(true);
 
-    if (!formData.nombre.trim()) {
+    if (!formData.name?.trim()) {
       setError("El nombre es obligatorio");
       setSaving(false);
       return;
     }
 
-    let imagenUrl = formData.imagen_url;
+    if (!formData.category_id) {
+      setError("Seleccioná una categoría antes de crear el producto");
+      setSaving(false);
+      return;
+    }
+
+    let primaryImageUrl = formData.primary_image_url;
     if (newFiles.length > 0) {
       setUploading(true);
-      imagenUrl = await handleImageUpload();
+      primaryImageUrl = await handleImageUpload();
       setUploading(false);
-      if (imagenUrl === null) {
+      if (primaryImageUrl === null) {
         setSaving(false);
         return;
       }
     }
 
-    const payload: Partial<ProductFormData> = {
-      ...formData,
-      imagen_url: imagenUrl,
+    const productPayload = {
+      category_id: formData.category_id,
+      subcategory_id: formData.subcategory_id || null,
+      name: formData.name.trim(),
+      slug: slugify(formData.name),
+      description: formData.description?.trim() || null,
+      price: formData.price ? Number(formData.price) : null,
+      show_price: Boolean(formData.show_price),
+      stock: Number(formData.stock || 0),
+      available: Boolean(formData.available),
+      primary_image_url: primaryImageUrl || null,
+      sort_order: Number(formData.sort_order || 0),
+      is_active: Boolean(formData.is_active),
     };
 
     if (isEditing && product) {
       const { error: updateError } = await supabase
         .from("products")
-        .update(payload)
+        .update(productPayload)
         .eq("id", product.id);
 
       if (updateError) {
-        setError("Error al actualizar el producto");
+        console.error("Error al actualizar producto:", updateError);
+        setError(`Error al actualizar el producto: ${updateError.message}`);
         setSaving(false);
         return;
       }
@@ -173,20 +193,23 @@ export default function ProductForm({ product }: Props) {
         setUploading(false);
       }
     } else {
-      const slug = formData.nombre
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, "")
-        .replace(/[\s_]+/g, "-")
-        .replace(/-+/g, "-");
+      console.log("Producto a insertar:", productPayload);
 
       const { data: newProduct, error: insertError } = await supabase
         .from("products")
-        .insert({ ...payload, slug })
+        .insert(productPayload)
         .select()
         .single();
 
-      if (insertError || !newProduct) {
-        setError("Error al crear el producto");
+      if (insertError) {
+        console.error("Error al crear producto:", insertError);
+        setError(`Error al crear producto: ${insertError.message}`);
+        setSaving(false);
+        return;
+      }
+
+      if (!newProduct) {
+        setError("Error al crear producto: no se recibieron datos");
         setSaving(false);
         return;
       }
@@ -227,7 +250,7 @@ export default function ProductForm({ product }: Props) {
     if (type === "checkbox") {
       const checked = (e.target as HTMLInputElement).checked;
       setFormData((prev) => ({ ...prev, [name]: checked }));
-    } else if (name === "precio" || name === "stock") {
+    } else if (name === "price" || name === "stock" || name === "sort_order") {
       setFormData((prev) => ({
         ...prev,
         [name]: value ? parseFloat(value) : null,
@@ -270,10 +293,10 @@ export default function ProductForm({ product }: Props) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-lg">
       <div>
-        <label htmlFor="nombre" className="block text-[10px] uppercase tracking-widest text-andes-mountain mb-1">
+        <label htmlFor="name" className="block text-[10px] uppercase tracking-widest text-andes-mountain mb-1">
           Nombre *
         </label>
-        <input id="nombre" name="nombre" type="text" value={formData.nombre}
+        <input id="name" name="name" type="text" value={formData.name ?? ""}
           onChange={handleChange} required
           className="w-full px-4 py-3 border border-andes-snow bg-white text-andes-black text-sm focus:outline-none focus:border-andes-ice" />
       </div>
@@ -314,19 +337,19 @@ export default function ProductForm({ product }: Props) {
       )}
 
       <div>
-        <label htmlFor="descripcion" className="block text-[10px] uppercase tracking-widest text-andes-mountain mb-1">
+        <label htmlFor="description" className="block text-[10px] uppercase tracking-widest text-andes-mountain mb-1">
           Descripción
         </label>
-        <textarea id="descripcion" name="descripcion" rows={4} value={formData.descripcion}
+        <textarea id="description" name="description" rows={4} value={formData.description ?? ""}
           onChange={handleChange}
           className="w-full px-4 py-3 border border-andes-snow bg-white text-andes-black text-sm focus:outline-none focus:border-andes-ice resize-none" />
       </div>
 
       <div>
-        <label htmlFor="precio" className="block text-[10px] uppercase tracking-widest text-andes-mountain mb-1">
+        <label htmlFor="price" className="block text-[10px] uppercase tracking-widest text-andes-mountain mb-1">
           Precio (ARS)
         </label>
-        <input id="precio" name="precio" type="number" step="0.01" value={formData.precio ?? ""}
+        <input id="price" name="price" type="number" step="0.01" value={formData.price ?? ""}
           onChange={handleChange}
           className="w-full px-4 py-3 border border-andes-snow bg-white text-andes-black text-sm focus:outline-none focus:border-andes-ice" />
       </div>
@@ -342,19 +365,19 @@ export default function ProductForm({ product }: Props) {
 
       <div className="space-y-3">
         <label className="flex items-center gap-3 cursor-pointer">
-          <input type="checkbox" name="mostrar_precio" checked={formData.mostrar_precio}
+          <input type="checkbox" name="show_price" checked={formData.show_price}
             onChange={handleChange} className="w-4 h-4 accent-andes-black" />
           <span className="text-xs uppercase tracking-widest text-andes-mountain">Mostrar precio en la web</span>
         </label>
         <label className="flex items-center gap-3 cursor-pointer">
-          <input type="checkbox" name="disponible" checked={formData.disponible}
+          <input type="checkbox" name="available" checked={formData.available}
             onChange={handleChange} className="w-4 h-4 accent-andes-black" />
           <span className="text-xs uppercase tracking-widest text-andes-mountain">Producto disponible</span>
         </label>
         <label className="flex items-center gap-3 cursor-pointer">
-          <input type="checkbox" name="destacado" checked={formData.destacado}
+          <input type="checkbox" name="is_active" checked={formData.is_active}
             onChange={handleChange} className="w-4 h-4 accent-andes-black" />
-          <span className="text-xs uppercase tracking-widest text-andes-mountain">Producto destacado (aparece en Home)</span>
+          <span className="text-xs uppercase tracking-widest text-andes-mountain">Producto activo</span>
         </label>
       </div>
 
@@ -370,9 +393,9 @@ export default function ProductForm({ product }: Props) {
             }
           }}
           className="w-full text-sm text-andes-mountain file:mr-4 file:py-2 file:px-4 file:border file:border-andes-snow file:text-[10px] file:uppercase file:tracking-widest file:bg-white file:text-andes-mountain hover:file:bg-andes-snow/50" />
-        {formData.imagen_url && newFiles.length === 0 && (
+        {formData.primary_image_url && newFiles.length === 0 && (
           <p className="mt-2 text-[10px] text-andes-mountain">
-            Imagen actual: {formData.imagen_url.split("/").pop()}
+            Imagen actual: {formData.primary_image_url.split("/").pop()}
           </p>
         )}
       </div>

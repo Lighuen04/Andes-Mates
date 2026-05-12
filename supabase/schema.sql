@@ -6,27 +6,25 @@
 -- ============================================================
 CREATE TABLE IF NOT EXISTS products (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  nombre TEXT NOT NULL,
+  name TEXT NOT NULL,
   slug TEXT NOT NULL UNIQUE,
-  descripcion TEXT NOT NULL DEFAULT '',
-  categoria TEXT NOT NULL DEFAULT '',
-  precio DECIMAL(10, 2),
-  mostrar_precio BOOLEAN NOT NULL DEFAULT true,
-  disponible BOOLEAN NOT NULL DEFAULT true,
-  destacado BOOLEAN NOT NULL DEFAULT false,
-  imagen_url TEXT,
-  stock INTEGER NOT NULL DEFAULT 0,
-  category_id UUID,
+  description TEXT DEFAULT '',
+  category_id UUID NOT NULL,
   subcategory_id UUID,
+  price DECIMAL(10, 2),
+  show_price BOOLEAN NOT NULL DEFAULT true,
+  stock INTEGER NOT NULL DEFAULT 0,
+  available BOOLEAN NOT NULL DEFAULT true,
+  primary_image_url TEXT,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  is_active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_products_slug ON products (slug);
-CREATE INDEX IF NOT EXISTS idx_products_categoria ON products (categoria);
-CREATE INDEX IF NOT EXISTS idx_products_destacado ON products (destacado) WHERE destacado = true;
-CREATE INDEX IF NOT EXISTS idx_products_disponible ON products (disponible) WHERE disponible = true;
+CREATE INDEX IF NOT EXISTS idx_products_available ON products (available) WHERE available = true;
 CREATE INDEX IF NOT EXISTS idx_products_category ON products (category_id);
 
 -- ============================================================

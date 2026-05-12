@@ -48,7 +48,7 @@ export default function EditarProductoPage() {
     <div className="min-h-screen bg-andes-white py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-2xl font-light tracking-wider text-andes-black mb-8">
-          Editar: {product.nombre}
+          Editar: {product.name}
         </h1>
         <ProductForm product={product} />
       </div>
