@@ -10,6 +10,16 @@ interface Props {
   product: CatalogProduct;
 }
 
+function formatPrice(price: number | null): string {
+  if (price === null) return "";
+  return new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(price);
+}
+
 export default function ProductGallery({ product }: Props) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const images = product.galleryImages;
@@ -42,32 +52,34 @@ export default function ProductGallery({ product }: Props) {
       </AnimatePresence>
 
       {/* Thumbnails */}
-      <div className="flex gap-3 overflow-x-auto pb-2">
-        {galleryItems.map((img, i) => (
-          <button
-            key={i}
-            onClick={() => setSelectedIndex(i)}
-            className={`flex-shrink-0 w-20 h-20 rounded-md overflow-hidden border-2 transition-all duration-200 ${
-              i === selectedIndex
-                ? "border-andes-ice opacity-100"
-                : "border-transparent opacity-60 hover:opacity-100"
-            }`}
-          >
-            {img ? (
-              <img
-                src={img}
-                alt={`${product.name} miniatura ${i + 1}`}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <ImagePlaceholder
-                className="w-full h-full"
-                text={`${i + 1}`}
-              />
-            )}
-          </button>
-        ))}
-      </div>
+      {galleryItems.length > 1 && (
+        <div className="flex gap-3 overflow-x-auto pb-2">
+          {galleryItems.map((img, i) => (
+            <button
+              key={i}
+              onClick={() => setSelectedIndex(i)}
+              className={`flex-shrink-0 w-20 h-20 rounded-md overflow-hidden border-2 transition-all duration-200 ${
+                i === selectedIndex
+                  ? "border-andes-ice opacity-100"
+                  : "border-transparent opacity-60 hover:opacity-100"
+              }`}
+            >
+              {img ? (
+                <img
+                  src={img}
+                  alt={`${product.name} miniatura ${i + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <ImagePlaceholder
+                  className="w-full h-full"
+                  text={`${i + 1}`}
+                />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Product info */}
       <div className="pt-4 space-y-4">
@@ -80,6 +92,16 @@ export default function ProductGallery({ product }: Props) {
               ? `Mates de ${product.subcategory}`
               : product.category}
           </p>
+          {product.show_price && product.price !== null && (
+            <p className="mt-2 text-xl font-medium text-andes-ice">
+              {formatPrice(product.price)}
+            </p>
+          )}
+          {product.stock === 0 && (
+            <p className="mt-2 text-xs uppercase tracking-widest text-andes-mountain">
+              Sin stock
+            </p>
+          )}
           {!product.available && (
             <p className="mt-2 text-xs uppercase tracking-widest text-red-600">
               No disponible

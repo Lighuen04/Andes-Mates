@@ -1,3 +1,6 @@
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import Link from "next/link";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import SectionTitle from "@/components/SectionTitle";
@@ -6,6 +9,7 @@ import { getCatalogSubcategories } from "@/lib/data";
 
 export default async function MatesPage() {
   const subs = await getCatalogSubcategories("mates");
+  console.log("Subcategorías encontradas:", subs);
 
   return (
     <div className="min-h-screen py-16">

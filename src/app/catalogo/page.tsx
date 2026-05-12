@@ -1,9 +1,13 @@
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import SectionTitle from "@/components/SectionTitle";
 import CategoryCard from "@/components/CategoryCard";
 import { getCatalogCategories } from "@/lib/data";
 
 export default async function CatalogoPage() {
   const categories = await getCatalogCategories();
+  console.log("Categorías encontradas:", categories);
 
   return (
     <div className="min-h-screen py-16">

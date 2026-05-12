@@ -1,3 +1,6 @@
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import Breadcrumbs from "@/components/Breadcrumbs";
 import SectionTitle from "@/components/SectionTitle";
 import ProductCard from "@/components/ProductCard";
@@ -5,6 +8,7 @@ import { getCatalogProductsByCategory } from "@/lib/data";
 
 export default async function MaterosPage() {
   const items = await getCatalogProductsByCategory("materos");
+  console.log("Productos encontrados en materos:", items);
 
   return (
     <div className="min-h-screen py-16">
@@ -12,13 +16,19 @@ export default async function MaterosPage() {
         <Breadcrumbs crumbs={[{ label: "Catálogo", href: "/catalogo" }]} />
         <SectionTitle title="Materos" subtitle="Materos" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-2xl mx-auto">
-          {items.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              href={`/catalogo/materos/${product.slug}`}
-            />
-          ))}
+          {items.length === 0 ? (
+            <p className="col-span-full text-center text-sm text-andes-mountain py-12">
+              Todavía no hay productos cargados en esta categoría.
+            </p>
+          ) : (
+            items.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                href={`/catalogo/materos/${product.slug}`}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>

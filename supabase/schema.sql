@@ -147,7 +147,9 @@ CREATE TRIGGER set_subcategories_updated_at
 -- Products
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Public read products" ON products;
-CREATE POLICY "Public read products" ON products FOR SELECT USING (true);
+CREATE POLICY "Public read products" ON products FOR SELECT USING (is_active = true);
+DROP POLICY IF EXISTS "Admin read all products" ON products;
+CREATE POLICY "Admin read all products" ON products FOR SELECT USING (auth.role() = 'authenticated');
 DROP POLICY IF EXISTS "Admin insert products" ON products;
 CREATE POLICY "Admin insert products" ON products FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 DROP POLICY IF EXISTS "Admin update products" ON products;
@@ -158,7 +160,9 @@ CREATE POLICY "Admin delete products" ON products FOR DELETE USING (auth.role() 
 -- Categories
 ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Public read categories" ON categories;
-CREATE POLICY "Public read categories" ON categories FOR SELECT USING (true);
+CREATE POLICY "Public read categories" ON categories FOR SELECT USING (is_active = true);
+DROP POLICY IF EXISTS "Admin read all categories" ON categories;
+CREATE POLICY "Admin read all categories" ON categories FOR SELECT USING (auth.role() = 'authenticated');
 DROP POLICY IF EXISTS "Admin insert categories" ON categories;
 CREATE POLICY "Admin insert categories" ON categories FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 DROP POLICY IF EXISTS "Admin update categories" ON categories;
@@ -169,7 +173,9 @@ CREATE POLICY "Admin delete categories" ON categories FOR DELETE USING (auth.rol
 -- Subcategories
 ALTER TABLE subcategories ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Public read subcategories" ON subcategories;
-CREATE POLICY "Public read subcategories" ON subcategories FOR SELECT USING (true);
+CREATE POLICY "Public read subcategories" ON subcategories FOR SELECT USING (is_active = true);
+DROP POLICY IF EXISTS "Admin read all subcategories" ON subcategories;
+CREATE POLICY "Admin read all subcategories" ON subcategories FOR SELECT USING (auth.role() = 'authenticated');
 DROP POLICY IF EXISTS "Admin insert subcategories" ON subcategories;
 CREATE POLICY "Admin insert subcategories" ON subcategories FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 DROP POLICY IF EXISTS "Admin update subcategories" ON subcategories;

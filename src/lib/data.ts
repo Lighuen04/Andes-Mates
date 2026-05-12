@@ -1,5 +1,5 @@
 import { createClient } from "./supabase/server";
-import type { Category, Subcategory, ProductImage } from "@/types/site";
+import type { Category, Subcategory } from "@/types/site";
 import type { Product } from "@/types/product";
 import {
   categories as fallbackCategories,
@@ -20,28 +20,25 @@ function mapDbCategoryToCatalog(dbCat: Category): CatalogCategory {
   };
 }
 
-function mapDbSubcategoryToCatalog(dbSub: Subcategory, catSlug: string): CatalogSubcategory {
-  return {
-    key: dbSub.slug,
-    name: dbSub.name,
-    slug: dbSub.slug,
-    categoryId: catSlug,
-    imageUrl: dbSub.image_url ?? undefined,
-    description: dbSub.description ?? undefined,
-  };
-}
-
-function mapDbProductToCatalog(dbProd: Product, catSlug: string, subSlug?: string): CatalogProduct {
+function mapDbProductToCatalog(
+  dbProd: Product,
+  catSlug: string,
+  subSlug?: string,
+  gallery?: string[]
+): CatalogProduct {
   return {
     id: dbProd.id,
     name: dbProd.name,
     slug: dbProd.slug,
     category: catSlug as CatalogProduct["category"],
     subcategory: subSlug as CatalogProduct["subcategory"],
-    description: dbProd.description || undefined,
+    description: dbProd.description ?? undefined,
     imageUrl: dbProd.primary_image_url ?? undefined,
-    galleryImages: [],
+    galleryImages: gallery ?? [],
     available: dbProd.available,
+    stock: dbProd.stock,
+    price: dbProd.price,
+    show_price: dbProd.show_price,
   };
 }
 
@@ -65,18 +62,27 @@ export async function getCatalogCategory(slug: string): Promise<CatalogCategory 
 
 export async function getCatalogSubcategories(categorySlug: string): Promise<CatalogSubcategory[]> {
   const supabase = await createClient();
-  const cat = await getCatalogCategory(categorySlug);
-  if (!cat) return [];
-  const catId = cat.id;
+
+  const { data: cat } = await supabase
+    .from("categories")
+    .select("id")
+    .eq("slug", categorySlug)
+    .eq("is_active", true)
+    .single();
+
+  if (!cat) {
+    return fallbackSubcategories.filter((s) => s.categoryId === categorySlug);
+  }
 
   const { data: dbSubs } = await supabase
     .from("subcategories")
-    .select("*, categories!inner(slug)")
-    .eq("category_id", catId)
+    .select("*")
+    .eq("category_id", cat.id)
     .eq("is_active", true)
     .order("name");
 
   if (dbSubs && dbSubs.length > 0) {
+    console.log("Subcategorías encontradas:", dbSubs);
     return dbSubs.map((s: any) => ({
       key: s.slug,
       name: s.name,
@@ -106,31 +112,35 @@ async function getProductGallery(productId: string): Promise<string[]> {
 
 export async function getCatalogProductsByCategory(categorySlug: string): Promise<CatalogProduct[]> {
   const supabase = await createClient();
-  const cat = await getCatalogCategory(categorySlug);
-  if (!cat) return [];
-  const catId = cat.id;
+
+  const { data: cat } = await supabase
+    .from("categories")
+    .select("id")
+    .eq("slug", categorySlug)
+    .eq("is_active", true)
+    .single();
+
+  if (!cat) {
+    console.log("No se encontró categoría con slug:", categorySlug);
+    return fallbackProducts.filter((p) => p.category === categorySlug);
+  }
+
+  console.log("Categoría encontrada:", cat);
 
   const { data: dbProds } = await supabase
     .from("products")
     .select("*")
-    .eq("category_id", catId)
-    .eq("available", true)
+    .eq("category_id", cat.id)
+    .eq("is_active", true)
     .order("created_at", { ascending: false });
+
+  console.log("Productos encontrados:", dbProds);
 
   if (dbProds && dbProds.length > 0) {
     const results: CatalogProduct[] = [];
     for (const p of dbProds) {
       const gallery = await getProductGallery(p.id);
-      results.push({
-        id: p.id,
-        name: p.name,
-        slug: p.slug,
-        category: categorySlug as CatalogProduct["category"],
-        description: p.description || undefined,
-        imageUrl: gallery[0] ?? p.primary_image_url ?? undefined,
-        galleryImages: gallery,
-        available: p.available,
-      });
+      results.push(mapDbProductToCatalog(p as unknown as Product, categorySlug, undefined, gallery));
     }
     return results;
   }
@@ -143,8 +153,20 @@ export async function getCatalogProductsBySubcategory(
   subcategorySlug: string
 ): Promise<CatalogProduct[]> {
   const supabase = await createClient();
-  const cat = await getCatalogCategory(categorySlug);
-  if (!cat) return [];
+
+  const { data: cat } = await supabase
+    .from("categories")
+    .select("id")
+    .eq("slug", categorySlug)
+    .eq("is_active", true)
+    .single();
+
+  if (!cat) {
+    console.log("No se encontró categoría con slug:", categorySlug);
+    return [];
+  }
+
+  console.log("Categoría encontrada:", cat);
 
   const { data: sub } = await supabase
     .from("subcategories")
@@ -154,33 +176,29 @@ export async function getCatalogProductsBySubcategory(
     .single();
 
   if (!sub) {
+    console.log("No se encontró subcategoría con slug:", subcategorySlug);
     return fallbackProducts.filter(
       (p) => p.category === categorySlug && p.subcategory === subcategorySlug
     );
   }
 
+  console.log("Subcategoría encontrada:", sub);
+
   const { data: dbProds } = await supabase
     .from("products")
     .select("*")
+    .eq("category_id", cat.id)
     .eq("subcategory_id", sub.id)
-    .eq("available", true)
+    .eq("is_active", true)
     .order("created_at", { ascending: false });
+
+  console.log("Productos encontrados:", dbProds);
 
   if (dbProds && dbProds.length > 0) {
     const results: CatalogProduct[] = [];
     for (const p of dbProds) {
       const gallery = await getProductGallery(p.id);
-      results.push({
-        id: p.id,
-        name: p.nombre,
-        slug: p.slug,
-        category: categorySlug as CatalogProduct["category"],
-        subcategory: subcategorySlug as CatalogProduct["subcategory"],
-        description: p.descripcion || undefined,
-        imageUrl: gallery[0] ?? p.imagen_url ?? undefined,
-        galleryImages: gallery,
-        available: p.disponible,
-      });
+      results.push(mapDbProductToCatalog(p as unknown as Product, categorySlug, subcategorySlug, gallery));
     }
     return results;
   }
@@ -199,17 +217,14 @@ export async function getCatalogProductBySlug(slug: string): Promise<CatalogProd
     .single();
 
   if (dbProd) {
+    console.log("Producto encontrado por slug:", dbProd);
     const gallery = await getProductGallery(dbProd.id);
-    return {
-      id: dbProd.id,
-      name: dbProd.name,
-      slug: dbProd.slug,
-      category: (dbProd.categories?.slug ?? "mates") as CatalogProduct["category"],
-      description: dbProd.description || undefined,
-      imageUrl: gallery[0] ?? dbProd.primary_image_url ?? undefined,
-      galleryImages: gallery,
-      available: dbProd.available,
-    };
+    return mapDbProductToCatalog(
+      dbProd as unknown as Product,
+      (dbProd as any).categories?.slug ?? "mates",
+      undefined,
+      gallery
+    );
   }
 
   const fallback = fallbackProducts.find((p) => p.slug === slug);
