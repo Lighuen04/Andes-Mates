@@ -9,27 +9,31 @@ import { formatPrecio } from "@/lib/utils";
 
 export default function AdminProductosPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const supabase = createClient();
 
-  useEffect(() => {
-    loadProducts();
-  }, []);
-
-  const loadProducts = async () => {
-    const { data } = await supabase
-      .from("products")
-      .select("*")
-      .order("created_at", { ascending: false });
-    setProducts(data ?? []);
+  const loadData = async () => {
+    const [productsRes, categoriesRes] = await Promise.all([
+      supabase.from("products").select("*").order("created_at", { ascending: false }),
+      supabase.from("categories").select("id, name").eq("is_active", true),
+    ]);
+    setProducts(productsRes.data ?? []);
+    setCategories(categoriesRes.data ?? []);
     setLoading(false);
   };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const categoryMap = new Map(categories.map((c) => [c.id, c.name]));
 
   const handleDelete = async (id: string) => {
     if (!confirm("¿Eliminar este producto?")) return;
     await supabase.from("products").delete().eq("id", id);
-    loadProducts();
+    loadData();
   };
 
   const toggleIsActive = async (product: Product) => {
@@ -37,7 +41,7 @@ export default function AdminProductosPage() {
       .from("products")
       .update({ is_active: !product.is_active })
       .eq("id", product.id);
-    loadProducts();
+    loadData();
   };
 
   const toggleAvailable = async (product: Product) => {
@@ -45,7 +49,7 @@ export default function AdminProductosPage() {
       .from("products")
       .update({ available: !product.available })
       .eq("id", product.id);
-    loadProducts();
+    loadData();
   };
 
   if (loading) {
@@ -100,7 +104,7 @@ export default function AdminProductosPage() {
                   </td>
                   <td className="px-4 py-3 text-andes-black font-medium">{product.name}</td>
                   <td className="px-4 py-3 text-andes-mountain text-[10px] uppercase tracking-widest">
-                    {product.category_id || "—"}
+                    {categoryMap.get(product.category_id ?? "") || "—"}
                   </td>
                   <td className="px-4 py-3 text-andes-mountain">
                     {product.show_price ? formatPrecio(product.price) : "-"}

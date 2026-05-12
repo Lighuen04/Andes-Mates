@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ImagePlaceholder from "./ImagePlaceholder";
 import WhatsAppButton from "./WhatsAppButton";
@@ -20,13 +20,32 @@ function formatPrice(price: number | null): string {
   }).format(price);
 }
 
+interface MediaItem {
+  url: string;
+  type: "image" | "video";
+  label: string;
+}
+
 export default function ProductGallery({ product }: Props) {
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const images = product.galleryImages;
-  const hasImages = images.length > 0;
 
-  const currentImage = hasImages ? images[selectedIndex] : null;
-  const galleryItems = hasImages ? images : Array(4).fill(null);
+  const allMedia = useMemo(() => {
+    const items: MediaItem[] = [];
+
+    if (product.primary_image_url) {
+      items.push({ url: product.primary_image_url, type: "image", label: "Principal" });
+    }
+
+    for (const url of product.galleryImages) {
+      if (url !== product.primary_image_url) {
+        items.push({ url, type: "image", label: `Foto ${items.length + 1}` });
+      }
+    }
+
+    return items;
+  }, [product.primary_image_url, product.galleryImages]);
+
+  const current = allMedia[selectedIndex] ?? null;
 
   return (
     <div className="space-y-6">
@@ -37,14 +56,24 @@ export default function ProductGallery({ product }: Props) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="aspect-square bg-andes-snow/30 overflow-hidden rounded-lg"
+          className="aspect-square bg-andes-snow/30 overflow-hidden rounded-lg flex items-center justify-center"
         >
-          {currentImage ? (
-            <img
-              src={currentImage}
-              alt={`${product.name} - Foto ${selectedIndex + 1}`}
-              className="w-full h-full object-cover"
-            />
+          {current ? (
+            current.type === "video" ? (
+              <video
+                src={current.url}
+                controls
+                className="w-full h-full object-contain"
+              >
+                Tu navegador no soporta video.
+              </video>
+            ) : (
+              <img
+                src={current.url}
+                alt={`${product.name} - ${current.label}`}
+                className="w-full h-full object-cover"
+              />
+            )
           ) : (
             <ImagePlaceholder className="w-full h-full" text="Foto pendiente" />
           )}
@@ -52,9 +81,9 @@ export default function ProductGallery({ product }: Props) {
       </AnimatePresence>
 
       {/* Thumbnails */}
-      {galleryItems.length > 1 && (
+      {allMedia.length > 1 && (
         <div className="flex gap-3 overflow-x-auto pb-2">
-          {galleryItems.map((img, i) => (
+          {allMedia.map((item, i) => (
             <button
               key={i}
               onClick={() => setSelectedIndex(i)}
@@ -64,16 +93,15 @@ export default function ProductGallery({ product }: Props) {
                   : "border-transparent opacity-60 hover:opacity-100"
               }`}
             >
-              {img ? (
+              {item.type === "video" ? (
+                <div className="w-full h-full bg-andes-black flex items-center justify-center text-andes-white text-xl">
+                  ▶
+                </div>
+              ) : (
                 <img
-                  src={img}
+                  src={item.url}
                   alt={`${product.name} miniatura ${i + 1}`}
                   className="w-full h-full object-cover"
-                />
-              ) : (
-                <ImagePlaceholder
-                  className="w-full h-full"
-                  text={`${i + 1}`}
                 />
               )}
             </button>

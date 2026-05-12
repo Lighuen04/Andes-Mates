@@ -14,6 +14,7 @@ export interface CatalogProduct {
   subcategory?: "calabaza" | "algarrobo";
   description?: string;
   imageUrl?: string;
+  primary_image_url?: string;
   galleryImages: string[];
   available: boolean;
   stock: number;

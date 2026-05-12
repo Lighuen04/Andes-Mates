@@ -64,9 +64,17 @@ CREATE TABLE IF NOT EXISTS product_images (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
   image_url TEXT NOT NULL,
+  media_url TEXT,
+  media_type TEXT DEFAULT 'image',
+  alt_text TEXT,
+  sort_order INTEGER DEFAULT 0,
   is_primary BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Migrate existing rows
+UPDATE product_images SET media_url = image_url WHERE media_url IS NULL AND image_url IS NOT NULL;
+UPDATE product_images SET media_type = 'image' WHERE media_type IS NULL;
 
 CREATE INDEX IF NOT EXISTS idx_product_images_product ON product_images (product_id);
 CREATE INDEX IF NOT EXISTS idx_product_images_primary ON product_images (product_id, is_primary) WHERE is_primary = true;

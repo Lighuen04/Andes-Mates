@@ -169,13 +169,14 @@ export default function ProductForm({ product }: Props) {
         return;
       }
 
-      // Upload additional images
+      // Upload additional media
       if (newFiles.length > 1) {
         setUploading(true);
         for (let i = 1; i < newFiles.length; i++) {
           const file = newFiles[i];
           const fileExt = file.name.split(".").pop();
           const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+          const mediaType = file.type.startsWith("video/") ? "video" : "image";
           const { error: upErr } = await supabase.storage
             .from("product-images")
             .upload(fileName, file);
@@ -186,6 +187,8 @@ export default function ProductForm({ product }: Props) {
             await supabase.from("product_images").insert({
               product_id: product.id,
               image_url: urlData.publicUrl,
+              media_url: urlData.publicUrl,
+              media_type: mediaType,
               is_primary: false,
             });
           }
@@ -214,13 +217,14 @@ export default function ProductForm({ product }: Props) {
         return;
       }
 
-      // Upload additional images
+      // Upload additional media
       if (newFiles.length > 1) {
         setUploading(true);
         for (let i = 1; i < newFiles.length; i++) {
           const file = newFiles[i];
           const fileExt = file.name.split(".").pop();
           const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+          const mediaType = file.type.startsWith("video/") ? "video" : "image";
           const { error: upErr } = await supabase.storage
             .from("product-images")
             .upload(fileName, file);
@@ -231,6 +235,8 @@ export default function ProductForm({ product }: Props) {
             await supabase.from("product_images").insert({
               product_id: newProduct.id,
               image_url: urlData.publicUrl,
+              media_url: urlData.publicUrl,
+              media_type: mediaType,
               is_primary: false,
             });
           }
@@ -262,6 +268,9 @@ export default function ProductForm({ product }: Props) {
 
   const handleSetPrimary = async (imageId: string) => {
     if (!product) return;
+    const img = images.find((i) => i.id === imageId);
+    if (!img) return;
+
     await supabase
       .from("product_images")
       .update({ is_primary: false })
@@ -270,16 +279,26 @@ export default function ProductForm({ product }: Props) {
       .from("product_images")
       .update({ is_primary: true })
       .eq("id", imageId);
+
+    const mediaUrl = img.media_url || img.image_url;
+    if (mediaUrl) {
+      await supabase
+        .from("products")
+        .update({ primary_image_url: mediaUrl })
+        .eq("id", product.id);
+    }
+
     loadImages(product.id);
   };
 
   const handleDeleteImage = async (imageId: string) => {
-    if (!confirm("¿Eliminar esta imagen?")) return;
+    if (!confirm("¿Eliminar este archivo?")) return;
     const img = images.find((i) => i.id === imageId);
     if (img) {
+      const url = img.media_url || img.image_url;
       await supabase.storage
         .from("product-images")
-        .remove([img.image_url.split("/").pop()!]);
+        .remove([url.split("/").pop()!]);
     }
     await supabase.from("product_images").delete().eq("id", imageId);
     if (product) loadImages(product.id);
@@ -403,49 +422,59 @@ export default function ProductForm({ product }: Props) {
       {/* Gallery */}
       <div>
         <label className="block text-[10px] uppercase tracking-widest text-andes-mountain mb-1">
-          Galería de fotos (adicionales)
+          Fotos / videos adicionales (opcional)
         </label>
-        <input type="file" accept="image/*" multiple
+        <input type="file" accept="image/*,video/*" multiple
           onChange={(e) => handleAddGalleryFiles(e.target.files)}
           className="w-full text-sm text-andes-mountain file:mr-4 file:py-2 file:px-4 file:border file:border-andes-snow file:text-[10px] file:uppercase file:tracking-widest file:bg-white file:text-andes-mountain hover:file:bg-andes-snow/50" />
       </div>
 
-      {/* Existing images gallery */}
+      {/* Existing media gallery */}
       {images.length > 0 && (
         <div>
           <p className="text-[10px] uppercase tracking-widest text-andes-mountain mb-2">
-            Fotos guardadas ({images.length})
+            Medios guardados ({images.length})
           </p>
           <div className="flex flex-wrap gap-3">
-            {images.map((img) => (
-              <div key={img.id} className="relative group">
-                <img src={img.image_url} alt="" className="w-20 h-20 object-cover border border-andes-snow" />
-                {img.is_primary && (
-                  <span className="absolute top-0 left-0 bg-andes-black text-andes-white text-[8px] px-1 uppercase tracking-widest">
-                    Principal
-                  </span>
-                )}
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                  {!img.is_primary && (
-                    <button type="button" onClick={() => handleSetPrimary(img.id)}
-                      className="text-[8px] text-white bg-andes-ice px-1 py-0.5 uppercase tracking-widest">
-                      Principal
-                    </button>
+            {images.map((img) => {
+              const url = img.media_url || img.image_url;
+              const isVideo = img.media_type === "video";
+              return (
+                <div key={img.id} className="relative group">
+                  {isVideo ? (
+                    <div className="w-20 h-20 bg-andes-black flex items-center justify-center text-andes-white text-xl border border-andes-snow">
+                      ▶
+                    </div>
+                  ) : (
+                    <img src={url} alt="" className="w-20 h-20 object-cover border border-andes-snow" />
                   )}
-                  <button type="button" onClick={() => handleDeleteImage(img.id)}
-                    className="text-[8px] text-white bg-red-600 px-1 py-0.5 uppercase tracking-widest">
-                    X
-                  </button>
+                  {img.is_primary && (
+                    <span className="absolute top-0 left-0 bg-andes-black text-andes-white text-[8px] px-1 uppercase tracking-widest">
+                      Principal
+                    </span>
+                  )}
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                    {!img.is_primary && (
+                      <button type="button" onClick={() => handleSetPrimary(img.id)}
+                        className="text-[8px] text-white bg-andes-ice px-1 py-0.5 uppercase tracking-widest">
+                        Principal
+                      </button>
+                    )}
+                    <button type="button" onClick={() => handleDeleteImage(img.id)}
+                      className="text-[8px] text-white bg-red-600 px-1 py-0.5 uppercase tracking-widest">
+                      X
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
 
       {newFiles.length > 1 && (
         <p className="text-[10px] text-andes-ice uppercase tracking-widest">
-          {newFiles.length - 1} foto(s) adicional(es) para subir
+          {newFiles.length - 1} archivo(s) adicional(es) para subir
         </p>
       )}
 

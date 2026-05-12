@@ -25,6 +25,10 @@ export interface ProductImage {
   id: string;
   product_id: string;
   image_url: string;
+  media_url?: string;
+  media_type?: string;
+  alt_text?: string;
+  sort_order?: number;
   is_primary: boolean;
   created_at: string;
 }
