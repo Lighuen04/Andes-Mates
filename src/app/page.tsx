@@ -16,7 +16,7 @@ const features = [
       "Cada producto está pensado para quienes valoran lo esencial y la belleza de lo simple.",
   },
   {
-    icon: "🐔",
+    icon: "🐴",
     title: "Tradición",
     description:
       "El mate como ceremonia, como encuentro, como parte de nuestra identidad.",
