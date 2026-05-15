@@ -21,6 +21,7 @@
 
   --transition-standard: 200ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-hover: 800ms cubic-bezier(0.22, 1, 0.36, 1);
 
   --container-max: 80rem;
   --container-narrow: 64rem;

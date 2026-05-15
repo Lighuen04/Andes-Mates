@@ -34,7 +34,7 @@ export default function Hero({ backgroundImage }: Props) {
         <div className="max-w-2xl">
           <motion.p
             variants={heroItemSubtitle}
-            className="text-andes-ice text-sm uppercase tracking-[0.2em] mb-4 font-medium"
+            className="text-white text-sm sm:text-base uppercase tracking-[0.2em] mb-4 font-semibold drop-shadow-[0_2px_8px_rgba(0,0,0,0.55)]"
           >
             Tradición y diseño de montaña
           </motion.p>

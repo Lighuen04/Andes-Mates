@@ -21,14 +21,14 @@ export default function ProductCard({ product, href }: Props) {
   return (
     <Link
       href={href}
-      className="group block bg-white rounded-(--radius-card) overflow-hidden shadow-(--shadow-card) hover:shadow-(--shadow-card-hover) hover:-translate-y-1 transition-all duration-(--transition-standard)"
+      className="group h-full flex flex-col bg-white rounded-(--radius-card) overflow-hidden shadow-(--shadow-card) hover:shadow-(--shadow-card-hover) hover:scale-[1.04] hover:-translate-y-1.5 transition-all duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
     >
       <div className="aspect-square overflow-hidden relative">
         {product.imageUrl ? (
           <img
             src={product.imageUrl}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-(--transition-slow)"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
           />
         ) : (
           <ImagePlaceholder
@@ -37,7 +37,7 @@ export default function ProductCard({ product, href }: Props) {
           />
         )}
       </div>
-      <div className="p-5 text-center">
+      <div className="flex-1 flex flex-col items-center justify-center p-5 text-center">
         <h3 className="font-serif text-base text-andes-black">
           {product.name}
         </h3>
