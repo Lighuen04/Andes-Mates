@@ -46,7 +46,7 @@ export default async function HomePage() {
             </div>
             <div className="text-center p-6">
               <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-andes-black flex items-center justify-center">
-                <span className="text-andes-ice text-xl">&#129545;</span>
+                <span className="text-andes-ice text-xl">&#128052;</span>
               </div>
               <h3 className="text-sm uppercase tracking-widest text-andes-black mb-2">Tradición</h3>
               <p className="text-sm text-andes-mountain leading-relaxed">
