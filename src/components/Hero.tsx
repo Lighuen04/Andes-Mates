@@ -1,55 +1,84 @@
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
 import WhatsAppButton from "./WhatsAppButton";
-import { DM_Serif_Display, Birthstone } from "next/font/google";
-
-const dmSerif = DM_Serif_Display({
-  subsets: ["latin"],
-  weight: "400",
-});
-
-const birthstone = Birthstone({
-  subsets: ["latin"],
-  weight: "400",
-});
 
 interface Props {
   backgroundImage?: string;
 }
 
 export default function Hero({ backgroundImage }: Props) {
-  const heroStyle = backgroundImage
-    ? {
-        backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: "cover" as const,
-        backgroundPosition: "center" as const,
-      }
-    : {};
-
   return (
-    <section
-      className="relative bg-andes-black min-h-[80vh] flex items-center"
-      style={heroStyle}
-    >
-      <div className="absolute inset-0 bg-gradient-to-b from-andes-blue/40 to-andes-black/80" />
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 w-full">
+    <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-andes-black">
+      {backgroundImage && (
+        <>
+          <div
+            className="absolute inset-0 bg-cover bg-center scale-105"
+            style={{ backgroundImage: `url(${backgroundImage})` }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-andes-blue/50 via-andes-black/60 to-andes-black/90" />
+        </>
+      )}
+      {!backgroundImage && (
+        <div className="absolute inset-0 bg-gradient-to-b from-andes-blue/20 to-andes-black" />
+      )}
+
+      <div className="relative w-full section-container">
         <div className="max-w-2xl">
-          <h1 className={`${dmSerif.className} text-5xl md:text-7xl font-light tracking-wider text-andes-white`}>
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-andes-ice text-sm uppercase tracking-[0.2em] mb-4 font-medium"
+          >
+            Tradición y diseño de montaña
+          </motion.p>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-andes-white leading-[1.1] tracking-tight text-balance"
+          >
             Andes Mates
-          </h1>
-          <p className={`${birthstone.className} mt-6 text-2xl text-andes-white leading-relaxed max-w-lg`}>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.35 }}
+            className="mt-6 text-base sm:text-lg text-andes-snow/80 leading-relaxed max-w-lg"
+          >
             Mates y accesorios inspirados en la Cordillera de los Andes.
-          </p>
-          <div className="mt-10 flex flex-wrap gap-4">
+            Simpleza, calidad y tradición en cada pieza.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="mt-10 flex flex-wrap gap-4"
+          >
             <Link
               href="/catalogo"
-              className="inline-flex items-center px-8 py-3 bg-andes-ice text-andes-white text-sm uppercase tracking-widest font-medium hover:bg-andes-blue transition-colors"
+              className="inline-flex items-center px-8 py-3.5 bg-andes-ice text-andes-white text-sm uppercase tracking-widest font-medium rounded-(--radius-button) hover:bg-andes-blue transition-all duration-(--transition-standard) shadow-lg shadow-andes-blue/20 hover:shadow-andes-blue/30"
             >
               Ver catálogo
             </Link>
-            <WhatsAppButton label="Escribinos" />
-          </div>
+            <WhatsAppButton label="Consultar por WhatsApp" variant="outline" />
+          </motion.div>
         </div>
       </div>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, delay: 0.8 }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:block"
+      >
+        <div className="w-px h-12 bg-gradient-to-b from-andes-snow/40 to-transparent" />
+      </motion.div>
     </section>
   );
 }

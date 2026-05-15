@@ -10,14 +10,14 @@ export default function CategoryCard({ category }: Props) {
   return (
     <Link
       href={`/catalogo/${category.slug}`}
-      className="group block bg-white border border-andes-snow overflow-hidden hover:border-andes-ice/40 hover:shadow-lg transition-all duration-300"
+      className="group block bg-white rounded-(--radius-card) overflow-hidden shadow-(--shadow-card) hover:shadow-(--shadow-card-hover) transition-all duration-(--transition-standard)"
     >
       <div className="aspect-square overflow-hidden">
         {category.imageUrl ? (
           <img
             src={category.imageUrl}
             alt={category.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-(--transition-slow)"
           />
         ) : (
           <ImagePlaceholder
@@ -26,12 +26,12 @@ export default function CategoryCard({ category }: Props) {
           />
         )}
       </div>
-      <div className="p-4 text-center">
-        <h3 className="text-sm font-medium text-andes-black tracking-wide uppercase">
+      <div className="p-5 text-center">
+        <h3 className="font-serif text-lg text-andes-black tracking-wide">
           {category.name}
         </h3>
         {category.description && (
-          <p className="mt-1 text-[10px] text-andes-mountain tracking-widest">
+          <p className="mt-1 text-xs text-andes-mountain tracking-wider leading-relaxed">
             {category.description}
           </p>
         )}

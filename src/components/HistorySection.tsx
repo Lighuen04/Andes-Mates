@@ -2,10 +2,10 @@ import SectionTitle from "./SectionTitle";
 
 export default function HistorySection() {
   return (
-    <section className="py-24 bg-andes-white">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-24 md:py-32 bg-andes-white">
+      <div className="section-container section-container--narrow">
         <SectionTitle title="Nuestra historia" subtitle="Andes Mates" />
-        <div className="space-y-6 text-sm text-andes-mountain leading-relaxed">
+        <div className="space-y-5 text-sm sm:text-base text-andes-mountain leading-relaxed max-w-2xl mx-auto">
           <p>
             Andes Mates nace cerca de la Cordillera de los Andes, con la idea
             de reunir mates y accesorios que transmitan simpleza, tradición y

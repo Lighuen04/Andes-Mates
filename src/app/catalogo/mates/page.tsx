@@ -9,37 +9,36 @@ import { getCatalogSubcategories } from "@/lib/data";
 
 export default async function MatesPage() {
   const subs = await getCatalogSubcategories("mates");
-  console.log("Subcategorías encontradas:", subs);
 
   return (
-    <div className="min-h-screen py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-16 md:py-24">
+      <div className="section-container">
         <Breadcrumbs crumbs={[{ label: "Catálogo", href: "/catalogo" }]} />
         <SectionTitle title="Mates" subtitle="Elegí una variedad" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-xl mx-auto">
           {subs.map((sub) => (
             <Link
               key={sub.key}
               href={`/catalogo/mates/${sub.slug}`}
-              className="group block bg-white border border-andes-snow overflow-hidden hover:border-andes-ice/40 hover:shadow-lg transition-all duration-300"
+              className="group block bg-white rounded-(--radius-card) overflow-hidden shadow-(--shadow-card) hover:shadow-(--shadow-card-hover) transition-all duration-(--transition-standard)"
             >
               <div className="aspect-square overflow-hidden">
                 {sub.imageUrl ? (
                   <img
                     src={sub.imageUrl}
                     alt={sub.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-(--transition-slow)"
                   />
                 ) : (
                   <ImagePlaceholder className="w-full h-full" text={sub.name} />
                 )}
               </div>
-              <div className="p-4 text-center">
-                <h3 className="text-sm font-medium text-andes-black tracking-wide uppercase">
+              <div className="p-5 text-center">
+                <h3 className="font-serif text-lg text-andes-black">
                   {sub.name}
                 </h3>
                 {sub.description && (
-                  <p className="mt-1 text-[10px] text-andes-mountain tracking-widest">
+                  <p className="mt-1 text-xs text-andes-mountain tracking-wider leading-relaxed">
                     {sub.description}
                   </p>
                 )}

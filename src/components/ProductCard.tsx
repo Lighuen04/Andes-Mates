@@ -21,14 +21,14 @@ export default function ProductCard({ product, href }: Props) {
   return (
     <Link
       href={href}
-      className="group block bg-white border border-andes-snow overflow-hidden hover:border-andes-ice/40 hover:shadow-lg transition-all duration-300"
+      className="group block bg-white rounded-(--radius-card) overflow-hidden shadow-(--shadow-card) hover:shadow-(--shadow-card-hover) transition-all duration-(--transition-standard)"
     >
       <div className="aspect-square overflow-hidden relative">
         {product.imageUrl ? (
           <img
             src={product.imageUrl}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-(--transition-slow)"
           />
         ) : (
           <ImagePlaceholder
@@ -37,22 +37,22 @@ export default function ProductCard({ product, href }: Props) {
           />
         )}
       </div>
-      <div className="p-4 text-center">
-        <h3 className="text-sm font-medium text-andes-black tracking-wide">
+      <div className="p-5 text-center">
+        <h3 className="font-serif text-base text-andes-black">
           {product.name}
         </h3>
         {product.show_price && product.price !== null && (
-          <p className="mt-1 text-sm font-medium text-andes-ice">
+          <p className="mt-1.5 text-sm font-medium text-andes-ice">
             {formatPrice(product.price)}
           </p>
         )}
         {product.stock === 0 && (
-          <p className="mt-1 text-[10px] uppercase tracking-widest text-andes-mountain">
+          <p className="mt-1.5 text-[10px] uppercase tracking-[0.15em] text-andes-mountain/60">
             Sin stock
           </p>
         )}
         {!product.available && (
-          <p className="mt-1 text-[10px] uppercase tracking-widest text-red-600">
+          <p className="mt-1.5 text-[10px] uppercase tracking-[0.15em] text-red-500/70">
             No disponible
           </p>
         )}

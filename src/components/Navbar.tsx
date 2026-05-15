@@ -22,14 +22,14 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="bg-andes-black border-b border-andes-mountain/30 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="bg-andes-black/95 backdrop-blur-sm border-b border-andes-mountain/20 sticky top-0 z-50">
+      <div className="section-container">
         <div className="flex items-center justify-between h-16">
           <Link
             href="/"
-            className="text-xl font-semibold tracking-wider text-andes-white"
+            className="font-serif text-xl sm:text-2xl tracking-wide text-andes-white"
           >
-            ANDES MATES
+            Andes Mates
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
@@ -40,7 +40,7 @@ export default function Navbar() {
                   href={getHref(link)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm uppercase tracking-widest text-andes-snow hover:text-andes-ice transition-colors"
+                  className="text-xs uppercase tracking-[0.2em] text-andes-snow/80 hover:text-andes-ice transition-colors duration-(--transition-standard)"
                 >
                   {link.label}
                 </a>
@@ -48,7 +48,7 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-sm uppercase tracking-widest text-andes-snow hover:text-andes-ice transition-colors"
+                  className="text-xs uppercase tracking-[0.2em] text-andes-snow/80 hover:text-andes-ice transition-colors duration-(--transition-standard)"
                 >
                   {link.label}
                 </Link>
@@ -88,7 +88,7 @@ export default function Navbar() {
       </div>
 
       {open && (
-        <div className="md:hidden border-t border-andes-mountain/30">
+        <div className="md:hidden border-t border-andes-mountain/20 bg-andes-black/95 backdrop-blur-sm">
           <div className="px-4 py-4 space-y-3">
             {links.map((link) =>
               link.external ? (
@@ -98,7 +98,7 @@ export default function Navbar() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setOpen(false)}
-                  className="block text-sm uppercase tracking-widest text-andes-snow hover:text-andes-ice transition-colors"
+                  className="block text-xs uppercase tracking-[0.2em] text-andes-snow/80 hover:text-andes-ice transition-colors duration-(--transition-standard)"
                 >
                   {link.label}
                 </a>
@@ -107,7 +107,7 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setOpen(false)}
-                  className="block text-sm uppercase tracking-widest text-andes-snow hover:text-andes-ice transition-colors"
+                  className="block text-xs uppercase tracking-[0.2em] text-andes-snow/80 hover:text-andes-ice transition-colors duration-(--transition-standard)"
                 >
                   {link.label}
                 </Link>

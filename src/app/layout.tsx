@@ -1,10 +1,19 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { DM_Serif_Display, Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
+
+const dmSerif = DM_Serif_Display({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-dm-serif",
+});
 
 export const metadata: Metadata = {
   title: "Andes Mates | Mates y accesorios",
@@ -18,8 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
-      <body className={`${inter.className} antialiased min-h-screen flex flex-col`}>
+    <html lang="es" className={`${inter.variable} ${dmSerif.variable}`}>
+      <body className="font-sans min-h-screen flex flex-col">
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />

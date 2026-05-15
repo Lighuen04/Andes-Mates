@@ -16,8 +16,8 @@ export default async function TermoProductoPage({ params }: Props) {
   if (!product) notFound();
 
   return (
-    <div className="min-h-screen py-16">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-16 md:py-24">
+      <div className="section-container">
         <Breadcrumbs
           crumbs={[
             { label: "Catálogo", href: "/catalogo" },

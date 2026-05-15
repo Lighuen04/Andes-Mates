@@ -3,16 +3,16 @@ import InstagramButton from "./InstagramButton";
 
 export default function ContactSection() {
   return (
-    <section className="py-24 bg-andes-black">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-3xl md:text-4xl font-light tracking-wider text-andes-white">
+    <section className="py-24 md:py-32 bg-andes-black">
+      <div className="section-container section-container--narrow text-center">
+        <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-andes-white leading-tight text-balance">
           Contacto
         </h2>
-        <p className="mt-4 text-andes-snow/70 text-sm leading-relaxed">
+        <p className="mt-4 text-andes-snow/60 text-sm sm:text-base leading-relaxed max-w-lg mx-auto">
           ¿Querés consultar por un producto? Escribinos por WhatsApp o Instagram
           para conocer disponibilidad, precios y opciones de entrega.
         </p>
-        <div className="mt-8 flex flex-wrap justify-center gap-4">
+        <div className="mt-10 flex flex-wrap justify-center gap-4">
           <WhatsAppButton label="WhatsApp" />
           <InstagramButton />
         </div>

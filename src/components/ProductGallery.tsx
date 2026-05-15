@@ -112,7 +112,7 @@ export default function ProductGallery({ product }: Props) {
       {/* Product info */}
       <div className="pt-4 space-y-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-light tracking-wider text-andes-black">
+          <h1 className="font-serif text-2xl md:text-3xl text-andes-black">
             {product.name}
           </h1>
           <p className="mt-1 text-[10px] uppercase tracking-widest text-andes-mountain">
