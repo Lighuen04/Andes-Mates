@@ -37,7 +37,7 @@ export default async function HomePage() {
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div className="text-center p-6">
               <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-andes-black flex items-center justify-center">
-                <span className="text-andes-ice text-xl">&#9968;</span>
+                <span className="text-andes-ice text-xl">&#127807;</span>
               </div>
               <h3 className="text-sm uppercase tracking-widest text-andes-black mb-2">Simpleza</h3>
               <p className="text-sm text-andes-mountain leading-relaxed">
@@ -46,7 +46,7 @@ export default async function HomePage() {
             </div>
             <div className="text-center p-6">
               <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-andes-black flex items-center justify-center">
-                <span className="text-andes-ice text-xl">&#9733;</span>
+                <span className="text-andes-ice text-xl">&#129545;</span>
               </div>
               <h3 className="text-sm uppercase tracking-widest text-andes-black mb-2">Tradición</h3>
               <p className="text-sm text-andes-mountain leading-relaxed">
@@ -55,7 +55,7 @@ export default async function HomePage() {
             </div>
             <div className="text-center p-6">
               <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-andes-black flex items-center justify-center">
-                <span className="text-andes-ice text-xl">&#127746;</span>
+                <span className="text-andes-ice text-xl">&#9968;</span>
               </div>
               <h3 className="text-sm uppercase tracking-widest text-andes-black mb-2">Montaña</h3>
               <p className="text-sm text-andes-mountain leading-relaxed">
