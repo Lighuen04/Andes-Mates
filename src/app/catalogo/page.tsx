@@ -3,7 +3,7 @@ export const revalidate = 0;
 
 import SectionTitle from "@/components/SectionTitle";
 import CategoryCard from "@/components/CategoryCard";
-import AnimatedSection from "@/components/AnimatedSection";
+import { StaggerGrid, StaggerItem } from "@/components/StaggerContainer";
 import { getCatalogCategories } from "@/lib/data";
 
 export default async function CatalogoPage() {
@@ -16,13 +16,13 @@ export default async function CatalogoPage() {
           title="Catálogo"
           subtitle="Mates, bombillas, materos, termos y combos"
         />
-        <AnimatedSection>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
-            {categories.map((cat) => (
-              <CategoryCard key={cat.id} category={cat} />
-            ))}
-          </div>
-        </AnimatedSection>
+        <StaggerGrid className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
+          {categories.map((cat) => (
+            <StaggerItem key={cat.id}>
+              <CategoryCard category={cat} />
+            </StaggerItem>
+          ))}
+        </StaggerGrid>
       </div>
     </div>
   );

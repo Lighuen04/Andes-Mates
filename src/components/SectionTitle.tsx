@@ -1,19 +1,21 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { smoothTransitionFast } from "@/lib/animations";
 
-interface Props {
+export default function SectionTitle({
+  title,
+  subtitle,
+}: {
   title: string;
   subtitle?: string;
-}
-
-export default function SectionTitle({ title, subtitle }: Props) {
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+      transition={smoothTransitionFast}
       className="text-center mb-12 md:mb-16"
     >
       <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-andes-black leading-tight text-balance">

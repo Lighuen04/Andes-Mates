@@ -4,7 +4,7 @@ export const revalidate = 0;
 import Breadcrumbs from "@/components/Breadcrumbs";
 import SectionTitle from "@/components/SectionTitle";
 import ProductCard from "@/components/ProductCard";
-import AnimatedSection from "@/components/AnimatedSection";
+import { StaggerGrid, StaggerItem } from "@/components/StaggerContainer";
 import { getCatalogProductsBySubcategory } from "@/lib/data";
 
 export default async function CalabazaPage() {
@@ -20,23 +20,22 @@ export default async function CalabazaPage() {
           ]}
         />
         <SectionTitle title="Mates de calabaza" subtitle="Calabaza" />
-        <AnimatedSection>
-          {items.length === 0 ? (
-            <p className="text-center text-sm text-andes-mountain py-12">
-              Todavía no hay productos cargados en esta categoría.
-            </p>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto">
-              {items.map((product) => (
+        {items.length === 0 ? (
+          <p className="text-center text-sm text-andes-mountain py-12">
+            Todavía no hay productos cargados en esta categoría.
+          </p>
+        ) : (
+          <StaggerGrid className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto">
+            {items.map((product) => (
+              <StaggerItem key={product.id}>
                 <ProductCard
-                  key={product.id}
                   product={product}
                   href={`/catalogo/mates/calabaza/${product.slug}`}
                 />
-              ))}
-            </div>
-          )}
-        </AnimatedSection>
+              </StaggerItem>
+            ))}
+          </StaggerGrid>
+        )}
       </div>
     </div>
   );

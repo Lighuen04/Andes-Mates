@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import WhatsAppButton from "./WhatsAppButton";
+import { heroContainer, heroItem, heroItemSubtitle } from "@/lib/animations";
 
 interface Props {
   backgroundImage?: string;
@@ -24,30 +25,29 @@ export default function Hero({ backgroundImage }: Props) {
         <div className="absolute inset-0 bg-gradient-to-b from-andes-blue/20 to-andes-black" />
       )}
 
-      <div className="relative w-full section-container">
+      <motion.div
+        variants={heroContainer}
+        initial="hidden"
+        animate="visible"
+        className="relative w-full section-container"
+      >
         <div className="max-w-2xl">
           <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            variants={heroItemSubtitle}
             className="text-andes-ice text-sm uppercase tracking-[0.2em] mb-4 font-medium"
           >
             Tradición y diseño de montaña
           </motion.p>
 
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            variants={heroItem}
             className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-andes-white leading-[1.1] tracking-tight text-balance"
           >
             Andes Mates
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.35 }}
+            variants={heroItem}
             className="mt-6 text-base sm:text-lg text-andes-snow/80 leading-relaxed max-w-lg"
           >
             Mates y accesorios inspirados en la Cordillera de los Andes.
@@ -55,9 +55,7 @@ export default function Hero({ backgroundImage }: Props) {
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
+            variants={heroItem}
             className="mt-10 flex flex-wrap gap-4"
           >
             <Link
@@ -69,12 +67,12 @@ export default function Hero({ backgroundImage }: Props) {
             <WhatsAppButton label="Consultar por WhatsApp" variant="outline" />
           </motion.div>
         </div>
-      </div>
+      </motion.div>
 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 0.8 }}
+        transition={{ duration: 1, delay: 1.2, ease: [0.22, 1, 0.36, 1] }}
         className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:block"
       >
         <div className="w-px h-12 bg-gradient-to-b from-andes-snow/40 to-transparent" />

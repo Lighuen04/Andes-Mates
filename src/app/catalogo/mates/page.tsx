@@ -5,6 +5,7 @@ import Link from "next/link";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import SectionTitle from "@/components/SectionTitle";
 import ImagePlaceholder from "@/components/ImagePlaceholder";
+import { StaggerGrid, StaggerItem } from "@/components/StaggerContainer";
 import { getCatalogSubcategories } from "@/lib/data";
 
 export default async function MatesPage() {
@@ -15,37 +16,38 @@ export default async function MatesPage() {
       <div className="section-container">
         <Breadcrumbs crumbs={[{ label: "Catálogo", href: "/catalogo" }]} />
         <SectionTitle title="Mates" subtitle="Elegí una variedad" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-xl mx-auto">
+        <StaggerGrid className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-xl mx-auto">
           {subs.map((sub) => (
-            <Link
-              key={sub.key}
-              href={`/catalogo/mates/${sub.slug}`}
-              className="group block bg-white rounded-(--radius-card) overflow-hidden shadow-(--shadow-card) hover:shadow-(--shadow-card-hover) transition-all duration-(--transition-standard)"
-            >
-              <div className="aspect-square overflow-hidden">
-                {sub.imageUrl ? (
-                  <img
-                    src={sub.imageUrl}
-                    alt={sub.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-(--transition-slow)"
-                  />
-                ) : (
-                  <ImagePlaceholder className="w-full h-full" text={sub.name} />
-                )}
-              </div>
-              <div className="p-5 text-center">
-                <h3 className="font-serif text-lg text-andes-black">
-                  {sub.name}
-                </h3>
-                {sub.description && (
-                  <p className="mt-1 text-xs text-andes-mountain tracking-wider leading-relaxed">
-                    {sub.description}
-                  </p>
-                )}
-              </div>
-            </Link>
+            <StaggerItem key={sub.key}>
+              <Link
+                href={`/catalogo/mates/${sub.slug}`}
+                className="group block bg-white rounded-(--radius-card) overflow-hidden shadow-(--shadow-card) hover:shadow-(--shadow-card-hover) hover:-translate-y-1 transition-all duration-(--transition-standard)"
+              >
+                <div className="aspect-square overflow-hidden">
+                  {sub.imageUrl ? (
+                    <img
+                      src={sub.imageUrl}
+                      alt={sub.name}
+                      className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-(--transition-slow)"
+                    />
+                  ) : (
+                    <ImagePlaceholder className="w-full h-full" text={sub.name} />
+                  )}
+                </div>
+                <div className="p-5 text-center">
+                  <h3 className="font-serif text-lg text-andes-black">
+                    {sub.name}
+                  </h3>
+                  {sub.description && (
+                    <p className="mt-1 text-xs text-andes-mountain tracking-wider leading-relaxed">
+                      {sub.description}
+                    </p>
+                  )}
+                </div>
+              </Link>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerGrid>
       </div>
     </div>
   );

@@ -10,14 +10,14 @@ export default function CategoryCard({ category }: Props) {
   return (
     <Link
       href={`/catalogo/${category.slug}`}
-      className="group block bg-white rounded-(--radius-card) overflow-hidden shadow-(--shadow-card) hover:shadow-(--shadow-card-hover) transition-all duration-(--transition-standard)"
+      className="group block bg-white rounded-(--radius-card) overflow-hidden shadow-(--shadow-card) hover:shadow-(--shadow-card-hover) hover:-translate-y-1 transition-all duration-(--transition-standard)"
     >
       <div className="aspect-square overflow-hidden">
         {category.imageUrl ? (
           <img
             src={category.imageUrl}
             alt={category.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-(--transition-slow)"
+            className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-(--transition-slow)"
           />
         ) : (
           <ImagePlaceholder

@@ -21,14 +21,14 @@ export default function ProductCard({ product, href }: Props) {
   return (
     <Link
       href={href}
-      className="group block bg-white rounded-(--radius-card) overflow-hidden shadow-(--shadow-card) hover:shadow-(--shadow-card-hover) transition-all duration-(--transition-standard)"
+      className="group block bg-white rounded-(--radius-card) overflow-hidden shadow-(--shadow-card) hover:shadow-(--shadow-card-hover) hover:-translate-y-1 transition-all duration-(--transition-standard)"
     >
       <div className="aspect-square overflow-hidden relative">
         {product.imageUrl ? (
           <img
             src={product.imageUrl}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-(--transition-slow)"
+            className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-(--transition-slow)"
           />
         ) : (
           <ImagePlaceholder
