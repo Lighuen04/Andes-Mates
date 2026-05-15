@@ -36,7 +36,7 @@ export default function Hero({ backgroundImage }: Props) {
           <h1 className={`${dmSerif.className} text-5xl md:text-7xl font-light tracking-wider text-andes-white`}>
             Andes Mates
           </h1>
-          <p className={`${birthstone.className} mt-6 text-2xl text-andes-snow/80 leading-relaxed max-w-lg`}>
+          <p className={`${birthstone.className} mt-6 text-2xl text-andes-white leading-relaxed max-w-lg`}>
             Mates y accesorios inspirados en la Cordillera de los Andes.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
