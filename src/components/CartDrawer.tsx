@@ -22,7 +22,7 @@ export default function CartDrawer({ open, onClose }: Props) {
     hasItemsWithoutPrice,
   } = useCart();
 
-  const alias =
+  const alias = 
     process.env.NEXT_PUBLIC_TRANSFER_ALIAS || "Alias no configurado";
   const instagramUrl = process.env.NEXT_PUBLIC_INSTAGRAM_URL || "";
 
