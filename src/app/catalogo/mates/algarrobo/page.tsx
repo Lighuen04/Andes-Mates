@@ -3,8 +3,7 @@ export const revalidate = 0;
 
 import Breadcrumbs from "@/components/Breadcrumbs";
 import SectionTitle from "@/components/SectionTitle";
-import ProductCard from "@/components/ProductCard";
-import { StaggerGrid, StaggerItem } from "@/components/StaggerContainer";
+import ProductGrid from "@/components/ProductGrid";
 import { getCatalogProductsBySubcategory } from "@/lib/data";
 
 export default async function AlgarroboPage() {
@@ -25,16 +24,10 @@ export default async function AlgarroboPage() {
             Todavía no hay productos cargados en esta categoría.
           </p>
         ) : (
-          <StaggerGrid className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto">
-            {items.map((product) => (
-              <StaggerItem key={product.id}>
-                <ProductCard
-                  product={product}
-                  href={`/catalogo/mates/algarrobo/${product.slug}`}
-                />
-              </StaggerItem>
-            ))}
-          </StaggerGrid>
+          <ProductGrid
+            products={items}
+            baseUrl="/catalogo/mates/algarrobo"
+          />
         )}
       </div>
     </div>

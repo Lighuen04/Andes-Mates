@@ -3,6 +3,7 @@ import { DM_Serif_Display, Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ClientProvider from "@/components/ClientProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -29,9 +30,11 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${inter.variable} ${dmSerif.variable}`}>
       <body className="font-sans min-h-screen flex flex-col">
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <ClientProvider>
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </ClientProvider>
       </body>
     </html>
   );

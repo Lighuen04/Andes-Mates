@@ -4,21 +4,13 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ImagePlaceholder from "./ImagePlaceholder";
 import WhatsAppButton from "./WhatsAppButton";
+import AddToCartButton from "./AddToCartButton";
 import type { CatalogProduct } from "@/data/catalog";
 import { smoothTransitionFast } from "@/lib/animations";
+import { formatPrice } from "@/lib/format";
 
 interface Props {
   product: CatalogProduct;
-}
-
-function formatPrice(price: number | null): string {
-  if (price === null) return "";
-  return new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(price);
 }
 
 interface MediaItem {
@@ -153,7 +145,10 @@ export default function ProductGallery({ product }: Props) {
           </p>
         )}
 
-        <WhatsAppButton productName={product.name} />
+        <div className="flex flex-wrap gap-3">
+          <AddToCartButton product={product} />
+          <WhatsAppButton productName={product.name} />
+        </div>
       </motion.div>
     </div>
   );
