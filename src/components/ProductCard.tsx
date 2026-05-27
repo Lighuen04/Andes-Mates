@@ -22,6 +22,7 @@ export default function ProductCard({ product, href }: Props) {
           <img
             src={product.imageUrl}
             alt={product.name}
+            loading="lazy"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
           />
         ) : (

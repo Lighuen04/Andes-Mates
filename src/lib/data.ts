@@ -83,7 +83,6 @@ export async function getCatalogSubcategories(categorySlug: string): Promise<Cat
     .order("name");
 
   if (dbSubs && dbSubs.length > 0) {
-    console.log("Subcategorías encontradas:", dbSubs);
     return dbSubs.map((s: any) => ({
       key: s.slug,
       name: s.name,
@@ -122,11 +121,8 @@ export async function getCatalogProductsByCategory(categorySlug: string): Promis
     .single();
 
   if (!cat) {
-    console.log("No se encontró categoría con slug:", categorySlug);
     return fallbackProducts.filter((p) => p.category === categorySlug);
   }
-
-  console.log("Categoría encontrada:", cat);
 
   const { data: dbProds } = await supabase
     .from("products")
@@ -135,15 +131,30 @@ export async function getCatalogProductsByCategory(categorySlug: string): Promis
     .eq("is_active", true)
     .order("created_at", { ascending: false });
 
-  console.log("Productos encontrados:", dbProds);
-
   if (dbProds && dbProds.length > 0) {
-    const results: CatalogProduct[] = [];
-    for (const p of dbProds) {
-      const gallery = await getProductGallery(p.id);
-      results.push(mapDbProductToCatalog(p as unknown as Product, categorySlug, undefined, gallery));
+    const ids = dbProds.map((p) => p.id);
+    const { data: allImages } = await supabase
+      .from("product_images")
+      .select("product_id, image_url, is_primary")
+      .in("product_id", ids)
+      .order("is_primary", { ascending: false })
+      .order("created_at", { ascending: true });
+
+    const galleryMap = new Map<string, string[]>();
+    if (allImages) {
+      for (const img of allImages) {
+        const list = galleryMap.get(img.product_id);
+        if (list) {
+          list.push(img.image_url);
+        } else {
+          galleryMap.set(img.product_id, [img.image_url]);
+        }
+      }
     }
-    return results;
+
+    return dbProds.map((p) =>
+      mapDbProductToCatalog(p as unknown as Product, categorySlug, undefined, galleryMap.get(p.id) ?? [])
+    );
   }
 
   return fallbackProducts.filter((p) => p.category === categorySlug);
@@ -163,11 +174,8 @@ export async function getCatalogProductsBySubcategory(
     .single();
 
   if (!cat) {
-    console.log("No se encontró categoría con slug:", categorySlug);
     return [];
   }
-
-  console.log("Categoría encontrada:", cat);
 
   const { data: sub } = await supabase
     .from("subcategories")
@@ -177,13 +185,10 @@ export async function getCatalogProductsBySubcategory(
     .single();
 
   if (!sub) {
-    console.log("No se encontró subcategoría con slug:", subcategorySlug);
     return fallbackProducts.filter(
       (p) => p.category === categorySlug && p.subcategory === subcategorySlug
     );
   }
-
-  console.log("Subcategoría encontrada:", sub);
 
   const { data: dbProds } = await supabase
     .from("products")
@@ -193,15 +198,30 @@ export async function getCatalogProductsBySubcategory(
     .eq("is_active", true)
     .order("created_at", { ascending: false });
 
-  console.log("Productos encontrados:", dbProds);
-
   if (dbProds && dbProds.length > 0) {
-    const results: CatalogProduct[] = [];
-    for (const p of dbProds) {
-      const gallery = await getProductGallery(p.id);
-      results.push(mapDbProductToCatalog(p as unknown as Product, categorySlug, subcategorySlug, gallery));
+    const ids = dbProds.map((p) => p.id);
+    const { data: allImages } = await supabase
+      .from("product_images")
+      .select("product_id, image_url, is_primary")
+      .in("product_id", ids)
+      .order("is_primary", { ascending: false })
+      .order("created_at", { ascending: true });
+
+    const galleryMap = new Map<string, string[]>();
+    if (allImages) {
+      for (const img of allImages) {
+        const list = galleryMap.get(img.product_id);
+        if (list) {
+          list.push(img.image_url);
+        } else {
+          galleryMap.set(img.product_id, [img.image_url]);
+        }
+      }
     }
-    return results;
+
+    return dbProds.map((p) =>
+      mapDbProductToCatalog(p as unknown as Product, categorySlug, subcategorySlug, galleryMap.get(p.id) ?? [])
+    );
   }
 
   return fallbackProducts.filter(
@@ -218,7 +238,6 @@ export async function getCatalogProductBySlug(slug: string): Promise<CatalogProd
     .single();
 
   if (dbProd) {
-    console.log("Producto encontrado por slug:", dbProd);
     const gallery = await getProductGallery(dbProd.id);
     return mapDbProductToCatalog(
       dbProd as unknown as Product,

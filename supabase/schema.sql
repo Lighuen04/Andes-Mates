@@ -1,126 +1,29 @@
 -- Andes Mates - Database Schema
 -- Run this SQL in your Supabase SQL Editor
 
--- ============================================================
--- PRODUCTS
--- ============================================================
+-- Create products table
 CREATE TABLE IF NOT EXISTS products (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  name TEXT NOT NULL,
+  nombre TEXT NOT NULL,
   slug TEXT NOT NULL UNIQUE,
-  description TEXT DEFAULT '',
-  category_id UUID NOT NULL,
-  subcategory_id UUID,
-  price DECIMAL(10, 2),
-  show_price BOOLEAN NOT NULL DEFAULT true,
-  stock INTEGER NOT NULL DEFAULT 0,
-  available BOOLEAN NOT NULL DEFAULT true,
-  primary_image_url TEXT,
-  sort_order INTEGER NOT NULL DEFAULT 0,
-  is_active BOOLEAN NOT NULL DEFAULT true,
+  descripcion TEXT NOT NULL DEFAULT '',
+  categoria TEXT NOT NULL CHECK (categoria IN ('calabaza', 'algarrobo', 'bombilla', 'bombillón', 'combo', 'termo', 'accesorio')),
+  precio DECIMAL(10, 2),
+  mostrar_precio BOOLEAN NOT NULL DEFAULT true,
+  disponible BOOLEAN NOT NULL DEFAULT true,
+  destacado BOOLEAN NOT NULL DEFAULT false,
+  imagen_url TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_products_slug ON products (slug);
-CREATE INDEX IF NOT EXISTS idx_products_available ON products (available) WHERE available = true;
-CREATE INDEX IF NOT EXISTS idx_products_category ON products (category_id);
+CREATE INDEX IF NOT EXISTS idx_products_categoria ON products (categoria);
+CREATE INDEX IF NOT EXISTS idx_products_destacado ON products (destacado) WHERE destacado = true;
+CREATE INDEX IF NOT EXISTS idx_products_disponible ON products (disponible) WHERE disponible = true;
 
--- ============================================================
--- CATEGORIES
--- ============================================================
-CREATE TABLE IF NOT EXISTS categories (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  name TEXT NOT NULL,
-  slug TEXT UNIQUE NOT NULL,
-  description TEXT,
-  image_url TEXT,
-  is_active BOOLEAN NOT NULL DEFAULT true,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- ============================================================
--- SUBCATEGORIES
--- ============================================================
-CREATE TABLE IF NOT EXISTS subcategories (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  category_id UUID NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  slug TEXT NOT NULL,
-  description TEXT,
-  image_url TEXT,
-  is_active BOOLEAN NOT NULL DEFAULT true,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  UNIQUE(category_id, slug)
-);
-
--- ============================================================
--- PRODUCT IMAGES (gallery)
--- ============================================================
-CREATE TABLE IF NOT EXISTS product_images (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
-  image_url TEXT NOT NULL,
-  media_url TEXT,
-  media_type TEXT DEFAULT 'image',
-  alt_text TEXT,
-  sort_order INTEGER DEFAULT 0,
-  is_primary BOOLEAN NOT NULL DEFAULT false,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- Migrate existing rows
-UPDATE product_images SET media_url = image_url WHERE media_url IS NULL AND image_url IS NOT NULL;
-UPDATE product_images SET media_type = 'image' WHERE media_type IS NULL;
-
-CREATE INDEX IF NOT EXISTS idx_product_images_product ON product_images (product_id);
-CREATE INDEX IF NOT EXISTS idx_product_images_primary ON product_images (product_id, is_primary) WHERE is_primary = true;
-
--- ============================================================
--- SITE SETTINGS (hero background, etc.)
--- The row with id = 'main' stores the hero_background_url
--- ============================================================
-CREATE TABLE IF NOT EXISTS site_settings (
-  id TEXT PRIMARY KEY DEFAULT 'main',
-  hero_background_url TEXT NOT NULL DEFAULT '',
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- ============================================================
--- ADMIN PROFILES
--- ============================================================
-CREATE TABLE IF NOT EXISTS public.admin_profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  username TEXT UNIQUE NOT NULL,
-  role TEXT NOT NULL DEFAULT 'admin',
-  is_active BOOLEAN NOT NULL DEFAULT true,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- ============================================================
--- FOREIGN KEYS (after tables exist)
--- ============================================================
--- Only add FK constraints if columns exist (for re-runs)
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'products' AND column_name = 'category_id') THEN
-    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'fk_products_category') THEN
-      ALTER TABLE products ADD CONSTRAINT fk_products_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL;
-    END IF;
-  END IF;
-  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'products' AND column_name = 'subcategory_id') THEN
-    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'fk_products_subcategory') THEN
-      ALTER TABLE products ADD CONSTRAINT fk_products_subcategory FOREIGN KEY (subcategory_id) REFERENCES subcategories(id) ON DELETE SET NULL;
-    END IF;
-  END IF;
-END $$;
-
--- ============================================================
--- AUTO-UPDATE updated_at FUNCTION
--- ============================================================
+-- Auto-update updated_at
 CREATE OR REPLACE FUNCTION update_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -129,128 +32,56 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Triggers
-DROP TRIGGER IF EXISTS set_products_updated_at ON products;
-CREATE TRIGGER set_products_updated_at
+CREATE TRIGGER set_updated_at
   BEFORE UPDATE ON products
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at();
 
-DROP TRIGGER IF EXISTS set_categories_updated_at ON categories;
-CREATE TRIGGER set_categories_updated_at
-  BEFORE UPDATE ON categories
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at();
-
-DROP TRIGGER IF EXISTS set_subcategories_updated_at ON subcategories;
-CREATE TRIGGER set_subcategories_updated_at
-  BEFORE UPDATE ON subcategories
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at();
-
--- ============================================================
--- ROW LEVEL SECURITY
--- ============================================================
-
--- Products
+-- Enable RLS
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Public read products" ON products;
-CREATE POLICY "Public read products" ON products FOR SELECT USING (is_active = true);
-DROP POLICY IF EXISTS "Admin read all products" ON products;
-CREATE POLICY "Admin read all products" ON products FOR SELECT USING (auth.role() = 'authenticated');
-DROP POLICY IF EXISTS "Admin insert products" ON products;
-CREATE POLICY "Admin insert products" ON products FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-DROP POLICY IF EXISTS "Admin update products" ON products;
-CREATE POLICY "Admin update products" ON products FOR UPDATE USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
-DROP POLICY IF EXISTS "Admin delete products" ON products;
-CREATE POLICY "Admin delete products" ON products FOR DELETE USING (auth.role() = 'authenticated');
 
--- Categories
-ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Public read categories" ON categories;
-CREATE POLICY "Public read categories" ON categories FOR SELECT USING (is_active = true);
-DROP POLICY IF EXISTS "Admin read all categories" ON categories;
-CREATE POLICY "Admin read all categories" ON categories FOR SELECT USING (auth.role() = 'authenticated');
-DROP POLICY IF EXISTS "Admin insert categories" ON categories;
-CREATE POLICY "Admin insert categories" ON categories FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-DROP POLICY IF EXISTS "Admin update categories" ON categories;
-CREATE POLICY "Admin update categories" ON categories FOR UPDATE USING (auth.role() = 'authenticated');
-DROP POLICY IF EXISTS "Admin delete categories" ON categories;
-CREATE POLICY "Admin delete categories" ON categories FOR DELETE USING (auth.role() = 'authenticated');
-
--- Subcategories
-ALTER TABLE subcategories ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Public read subcategories" ON subcategories;
-CREATE POLICY "Public read subcategories" ON subcategories FOR SELECT USING (is_active = true);
-DROP POLICY IF EXISTS "Admin read all subcategories" ON subcategories;
-CREATE POLICY "Admin read all subcategories" ON subcategories FOR SELECT USING (auth.role() = 'authenticated');
-DROP POLICY IF EXISTS "Admin insert subcategories" ON subcategories;
-CREATE POLICY "Admin insert subcategories" ON subcategories FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-DROP POLICY IF EXISTS "Admin update subcategories" ON subcategories;
-CREATE POLICY "Admin update subcategories" ON subcategories FOR UPDATE USING (auth.role() = 'authenticated');
-DROP POLICY IF EXISTS "Admin delete subcategories" ON subcategories;
-CREATE POLICY "Admin delete subcategories" ON subcategories FOR DELETE USING (auth.role() = 'authenticated');
-
--- Product images
-ALTER TABLE product_images ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Public read product_images" ON product_images;
-CREATE POLICY "Public read product_images" ON product_images FOR SELECT USING (true);
-DROP POLICY IF EXISTS "Admin insert product_images" ON product_images;
-CREATE POLICY "Admin insert product_images" ON product_images FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-DROP POLICY IF EXISTS "Admin update product_images" ON product_images;
-CREATE POLICY "Admin update product_images" ON product_images FOR UPDATE USING (auth.role() = 'authenticated');
-DROP POLICY IF EXISTS "Admin delete product_images" ON product_images;
-CREATE POLICY "Admin delete product_images" ON product_images FOR DELETE USING (auth.role() = 'authenticated');
-
--- Site settings
-ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Public read site_settings" ON site_settings;
-CREATE POLICY "Public read site_settings" ON site_settings FOR SELECT USING (true);
-DROP POLICY IF EXISTS "Admin insert site_settings" ON site_settings;
-CREATE POLICY "Admin insert site_settings" ON site_settings FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-DROP POLICY IF EXISTS "Admin update site_settings" ON site_settings;
-CREATE POLICY "Admin update site_settings" ON site_settings FOR UPDATE USING (auth.role() = 'authenticated');
-DROP POLICY IF EXISTS "Admin delete site_settings" ON site_settings;
-CREATE POLICY "Admin delete site_settings" ON site_settings FOR DELETE USING (auth.role() = 'authenticated');
-
--- Admin profiles
-ALTER TABLE public.admin_profiles ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Users can read own admin profile" ON public.admin_profiles;
-CREATE POLICY "Users can read own admin profile"
-  ON public.admin_profiles
+-- Public read access (anyone can read products)
+CREATE POLICY "Public read products"
+  ON products
   FOR SELECT
-  USING (auth.uid() = id);
+  USING (true);
 
--- ============================================================
--- STORAGE BUCKETS (run in Supabase Dashboard > Storage)
--- ============================================================
--- Create buckets:
---   "product-images"  -> public bucket for product photos
---   "category-images" -> public bucket for category images
---   "site-images"     -> public bucket for site images (hero, etc.)
+-- Authenticated users (admins) can insert
+CREATE POLICY "Admin insert products"
+  ON products
+  FOR INSERT
+  WITH CHECK (auth.role() = 'authenticated');
+
+-- Authenticated users (admins) can update
+CREATE POLICY "Admin update products"
+  ON products
+  FOR UPDATE
+  USING (auth.role() = 'authenticated')
+  WITH CHECK (auth.role() = 'authenticated');
+
+-- Authenticated users (admins) can delete
+CREATE POLICY "Admin delete products"
+  ON products
+  FOR DELETE
+  USING (auth.role() = 'authenticated');
+
+------------------------------------------------------------
+-- Storage bucket setup (run in Supabase Dashboard > Storage)
+-- 1. Create a bucket named "product-images"
+-- 2. Set it to public
+-- 3. Add this policy for public read:
 --
--- For each bucket, add:
+-- CREATE POLICY "Public read product-images"
+--   ON storage.objects
+--   FOR SELECT
+--   USING (bucket_id = 'product-images');
 --
--- Public read:
---   CREATE POLICY "Public read BUCKET_NAME"
---     ON storage.objects
---     FOR SELECT
---     USING (bucket_id = 'BUCKET_NAME');
+-- 4. Add this policy for authenticated upload:
 --
--- Authenticated upload:
---   CREATE POLICY "Admin upload BUCKET_NAME"
---     ON storage.objects
---     FOR INSERT
---     WITH CHECK (
---       bucket_id = 'BUCKET_NAME'
---       AND auth.role() = 'authenticated'
---     );
---
--- Authenticated delete:
---   CREATE POLICY "Admin delete BUCKET_NAME"
---     ON storage.objects
---     FOR DELETE
---     USING (
---       bucket_id = 'BUCKET_NAME'
---       AND auth.role() = 'authenticated'
---     );
+-- CREATE POLICY "Admin upload product-images"
+--   ON storage.objects
+--   FOR INSERT
+--   WITH CHECK (
+--     bucket_id = 'product-images'
+--     AND auth.role() = 'authenticated'
+--   );

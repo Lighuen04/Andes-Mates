@@ -69,6 +69,7 @@ export default function ProductGallery({ product }: Props) {
               <img
                 src={current.url}
                 alt={`${product.name} - ${current.label}`}
+                loading="lazy"
                 className="w-full h-full object-cover"
               />
             )
@@ -98,6 +99,7 @@ export default function ProductGallery({ product }: Props) {
                 <img
                   src={item.url}
                   alt={`${product.name} miniatura ${i + 1}`}
+                  loading="lazy"
                   className="w-full h-full object-cover"
                 />
               )}

@@ -17,6 +17,7 @@ export default function CategoryCard({ category }: Props) {
           <img
             src={category.imageUrl}
             alt={category.name}
+            loading="lazy"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
           />
         ) : (
