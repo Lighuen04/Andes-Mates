@@ -97,18 +97,25 @@ export default function ProductForm({ product }: Props) {
     const fileExt = file.name.split(".").pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
+    console.log("Subiendo archivo:", fileName, file.name, file.type, file.size);
+
     const { error: uploadError } = await supabase.storage
       .from("product-images")
-      .upload(fileName, file);
+      .upload(fileName, file, { upsert: true });
 
     if (uploadError) {
-      setError("Error al subir la imagen");
+      console.error("Error detallado al subir:", uploadError);
+      setError(`Error al subir la imagen: ${uploadError.message}`);
       return null;
     }
+
+    console.log("Archivo subido exitosamente");
 
     const { data: urlData } = supabase.storage
       .from("product-images")
       .getPublicUrl(fileName);
+
+    console.log("URL pública generada:", urlData.publicUrl);
 
     return urlData.publicUrl;
   };
