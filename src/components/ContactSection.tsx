@@ -13,7 +13,14 @@ export default function ContactSection() {
           para conocer disponibilidad, precios y opciones de entrega.
         </p>
         <div className="mt-10 flex flex-wrap justify-center gap-4">
-          <WhatsAppButton label="WhatsApp" />
+          <WhatsAppButton
+            label="Lighuen"
+            phone="5492942530736"
+          />
+          <WhatsAppButton
+            label="Alejandro"
+            phone="5492604652513"
+          />
           <InstagramButton />
         </div>
       </div>

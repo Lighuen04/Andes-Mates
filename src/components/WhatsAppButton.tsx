@@ -5,6 +5,7 @@ interface Props {
   label?: string;
   className?: string;
   variant?: "solid" | "outline";
+  phone?: string;
 }
 
 export default function WhatsAppButton({
@@ -12,8 +13,9 @@ export default function WhatsAppButton({
   label = "Consultar por WhatsApp",
   className = "",
   variant = "solid",
+  phone,
 }: Props) {
-  const href = getWhatsAppLink(getWhatsAppNumber(), productName);
+  const href = getWhatsAppLink(phone ?? getWhatsAppNumber(), productName);
 
   const base =
     "inline-flex items-center justify-center gap-2 px-8 py-3.5 text-sm uppercase tracking-widest font-medium rounded-(--radius-button) transition-all duration-(--transition-standard)";
