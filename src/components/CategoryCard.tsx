@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import ImagePlaceholder from "./ImagePlaceholder";
 import type { CatalogCategory } from "@/data/catalog";
 
@@ -10,15 +11,17 @@ export default function CategoryCard({ category }: Props) {
   return (
     <Link
       href={`/catalogo/${category.slug}`}
+      prefetch={true}
       className="group h-full flex flex-col bg-white rounded-(--radius-card) overflow-hidden shadow-(--shadow-card) hover:shadow-(--shadow-card-hover) hover:scale-[1.04] hover:-translate-y-1.5 transition-all duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
     >
-      <div className="aspect-square overflow-hidden">
+      <div className="aspect-square overflow-hidden relative">
         {category.imageUrl ? (
-          <img
+          <Image
             src={category.imageUrl}
             alt={category.name}
-            loading="lazy"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 20vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
           />
         ) : (
           <ImagePlaceholder

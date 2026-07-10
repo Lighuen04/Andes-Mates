@@ -1,4 +1,3 @@
-import { unstable_cache } from "next/cache";
 import { createClient } from "./supabase/server";
 import type { Category, Subcategory } from "@/types/site";
 import type { Product } from "@/types/product";
@@ -10,8 +9,6 @@ import {
   type CatalogProduct,
   type CatalogSubcategory,
 } from "@/data/catalog";
-
-const REVALIDATE = 60;
 
 function mapDbCategoryToCatalog(dbCat: Category): CatalogCategory {
   return {
@@ -46,7 +43,7 @@ function mapDbProductToCatalog(
   };
 }
 
-async function fetchCatalogCategories(): Promise<CatalogCategory[]> {
+export async function getCatalogCategories(): Promise<CatalogCategory[]> {
   const supabase = await createClient();
   const { data: dbCats } = await supabase
     .from("categories")
@@ -59,18 +56,12 @@ async function fetchCatalogCategories(): Promise<CatalogCategory[]> {
   return fallbackCategories;
 }
 
-export const getCatalogCategories = unstable_cache(
-  fetchCatalogCategories,
-  ["catalog-categories"],
-  { revalidate: REVALIDATE, tags: ["catalog"] }
-);
-
 export async function getCatalogCategory(slug: string): Promise<CatalogCategory | undefined> {
   const all = await getCatalogCategories();
   return all.find((c) => c.slug === slug);
 }
 
-async function fetchCatalogSubcategories(categorySlug: string): Promise<CatalogSubcategory[]> {
+export async function getCatalogSubcategories(categorySlug: string): Promise<CatalogSubcategory[]> {
   const supabase = await createClient();
 
   const { data: cat } = await supabase
@@ -105,12 +96,6 @@ async function fetchCatalogSubcategories(categorySlug: string): Promise<CatalogS
   return fallbackSubcategories.filter((s) => s.categoryId === categorySlug);
 }
 
-export const getCatalogSubcategories = unstable_cache(
-  fetchCatalogSubcategories,
-  ["catalog-subcategories"],
-  { revalidate: REVALIDATE, tags: ["catalog"] }
-);
-
 async function getProductGallery(productId: string): Promise<string[]> {
   const supabase = await createClient();
   const { data } = await supabase
@@ -125,7 +110,7 @@ async function getProductGallery(productId: string): Promise<string[]> {
   return [];
 }
 
-async function fetchCatalogProductsByCategory(categorySlug: string): Promise<CatalogProduct[]> {
+export async function getCatalogProductsByCategory(categorySlug: string): Promise<CatalogProduct[]> {
   const supabase = await createClient();
 
   const { data: cat } = await supabase
@@ -175,13 +160,7 @@ async function fetchCatalogProductsByCategory(categorySlug: string): Promise<Cat
   return fallbackProducts.filter((p) => p.category === categorySlug);
 }
 
-export const getCatalogProductsByCategory = unstable_cache(
-  fetchCatalogProductsByCategory,
-  ["catalog-products-by-category"],
-  { revalidate: REVALIDATE, tags: ["catalog", "products"] }
-);
-
-async function fetchCatalogProductsBySubcategory(
+export async function getCatalogProductsBySubcategory(
   categorySlug: string,
   subcategorySlug: string
 ): Promise<CatalogProduct[]> {
@@ -250,13 +229,7 @@ async function fetchCatalogProductsBySubcategory(
   );
 }
 
-export const getCatalogProductsBySubcategory = unstable_cache(
-  fetchCatalogProductsBySubcategory,
-  ["catalog-products-by-subcategory"],
-  { revalidate: REVALIDATE, tags: ["catalog", "products"] }
-);
-
-async function fetchCatalogProductBySlug(slug: string): Promise<CatalogProduct | null> {
+export async function getCatalogProductBySlug(slug: string): Promise<CatalogProduct | null> {
   const supabase = await createClient();
   const { data: dbProd } = await supabase
     .from("products")
@@ -277,9 +250,3 @@ async function fetchCatalogProductBySlug(slug: string): Promise<CatalogProduct |
   const fallback = fallbackProducts.find((p) => p.slug === slug);
   return fallback ?? null;
 }
-
-export const getCatalogProductBySlug = unstable_cache(
-  fetchCatalogProductBySlug,
-  ["catalog-product-by-slug"],
-  { revalidate: REVALIDATE, tags: ["catalog", "products"] }
-);

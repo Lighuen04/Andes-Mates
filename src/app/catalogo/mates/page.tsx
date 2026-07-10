@@ -1,6 +1,7 @@
 export const revalidate = 60;
 
 import Link from "next/link";
+import Image from "next/image";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import SectionTitle from "@/components/SectionTitle";
 import ImagePlaceholder from "@/components/ImagePlaceholder";
@@ -20,15 +21,17 @@ export default async function MatesPage() {
             <StaggerItem key={sub.key}>
               <Link
                 href={`/catalogo/mates/${sub.slug}`}
+                prefetch={true}
                 className="group h-full flex flex-col bg-white rounded-(--radius-card) overflow-hidden shadow-(--shadow-card) hover:shadow-(--shadow-card-hover) hover:scale-[1.04] hover:-translate-y-1.5 transition-all duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
               >
-                <div className="aspect-square overflow-hidden">
+                <div className="aspect-square overflow-hidden relative">
                   {sub.imageUrl ? (
-                    <img
+                    <Image
                       src={sub.imageUrl}
                       alt={sub.name}
-                      loading="lazy"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+                      fill
+                      sizes="(max-width: 640px) 100vw, 50vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
                     />
                   ) : (
                     <ImagePlaceholder className="w-full h-full" text={sub.name} />
