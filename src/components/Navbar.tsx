@@ -1,9 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
+import Link from "next/link";
+import dynamic from "next/dynamic";
 import CartButton from "./CartButton";
-import CartDrawer from "./CartDrawer";
+
+const CartDrawer = dynamic(() => import("./CartDrawer"), { ssr: false });
 
 const links = [
   { href: "/", label: "Inicio" },

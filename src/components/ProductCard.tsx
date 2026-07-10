@@ -1,6 +1,5 @@
-"use client";
-
 import Link from "next/link";
+import Image from "next/image";
 import ImagePlaceholder from "./ImagePlaceholder";
 import AddToCartButton from "./AddToCartButton";
 import type { CatalogProduct } from "@/data/catalog";
@@ -19,11 +18,12 @@ export default function ProductCard({ product, href }: Props) {
         className="block aspect-square overflow-hidden relative"
       >
         {product.imageUrl ? (
-          <img
+          <Image
             src={product.imageUrl}
             alt={product.name}
-            loading="lazy"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
           />
         ) : (
           <ImagePlaceholder

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import ImagePlaceholder from "./ImagePlaceholder";
 import WhatsAppButton from "./WhatsAppButton";
@@ -66,11 +67,12 @@ export default function ProductGallery({ product }: Props) {
                 Tu navegador no soporta video.
               </video>
             ) : (
-              <img
+              <Image
                 src={current.url}
                 alt={`${product.name} - ${current.label}`}
-                loading="lazy"
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover"
               />
             )
           ) : (
@@ -96,11 +98,12 @@ export default function ProductGallery({ product }: Props) {
                   ▶
                 </div>
               ) : (
-                <img
+                <Image
                   src={item.url}
                   alt={`${product.name} miniatura ${i + 1}`}
-                  loading="lazy"
-                  className="w-full h-full object-cover"
+                  fill
+                  sizes="80px"
+                  className="object-cover"
                 />
               )}
             </button>
