@@ -4,7 +4,7 @@
   "description": "Andes Mates - Catálogo digital de mates y accesorios",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "rm -rf .next && next build",
     "start": "next start",
     "lint": "next lint"
   },
