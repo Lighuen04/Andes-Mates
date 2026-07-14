@@ -41,7 +41,7 @@ export default function Footer() {
             </h4>
             <div className="space-y-2.5">
               <a
-                href="https://wa.me/5492942530736"
+                href="https://wa.me/5492604652513"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block text-sm text-andes-snow/60 hover:text-andes-ice transition-colors duration-(--transition-standard)"

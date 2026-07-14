@@ -15,7 +15,7 @@ export default function ContactSection() {
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <WhatsAppButton
             label="Lighuen"
-            phone="5492942530736"
+            phone="5492604652513"
           />
           <WhatsAppButton
             label="Alejandro"

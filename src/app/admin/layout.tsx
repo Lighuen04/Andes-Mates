@@ -143,6 +143,12 @@ export default function AdminLayout({
                     Productos
                   </Link>
                   <Link
+                    href="/admin/pedidos"
+                    className="text-[10px] uppercase tracking-widest text-andes-mountain hover:text-andes-black transition-colors"
+                  >
+                    Pedidos
+                  </Link>
+                  <Link
                     href="/admin/catalogo/categorias"
                     className="text-[10px] uppercase tracking-widest text-andes-mountain hover:text-andes-black transition-colors"
                   >

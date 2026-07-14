@@ -10,7 +10,7 @@ export function getWhatsAppLink(phone: string, productName?: string): string {
 }
 
 export function getWhatsAppNumber(): string {
-  return "5492942530736";
+  return "5492604652513";
 }
 
 export function slugify(text: string): string {

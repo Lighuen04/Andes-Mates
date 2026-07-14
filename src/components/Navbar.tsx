@@ -17,7 +17,7 @@ const links = [
 function getHref(link: (typeof links)[0]) {
   if (!link.external) return link.href;
   if (link.href === "whatsapp") {
-    return "https://wa.me/5492942530736";
+    return "https://wa.me/5492604652513";
   }
   return process.env.NEXT_PUBLIC_INSTAGRAM_URL || "#";
 }

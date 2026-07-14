@@ -42,5 +42,5 @@ export function getCartWhatsAppLink(
     hasItemsWithoutPrice,
     alias
   );
-  return `https://wa.me/5492942530736?text=${encodeURIComponent(message)}`;
+  return `https://wa.me/5492604652513?text=${encodeURIComponent(message)}`;
 }
